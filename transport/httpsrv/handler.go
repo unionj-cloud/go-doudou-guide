@@ -42,7 +42,7 @@ func Routes(handler UsersvcHandler) []ddhttp.Route {
 		},
 		{
 			"DownloadAvatar",
-			"GET",
+			"POST",
 			"/usersvc/downloadavatar",
 			handler.DownloadAvatar,
 		},

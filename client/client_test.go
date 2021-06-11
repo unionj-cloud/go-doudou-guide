@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"usersvc/vo"
 )
 
 func init() {
@@ -125,6 +126,57 @@ func TestUsersvcClient_DownloadAvatar(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DownloadAvatar() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUsersvcClient_PageUsers(t *testing.T) {
+	type args struct {
+		ctx   context.Context
+		query vo.PageQuery
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantCode int
+		wantData vo.PageRet
+		wantErr  bool
+	}{
+		{
+			name: "3",
+			args: args{
+				ctx: context.Background(),
+				query: vo.PageQuery{
+					Filter: vo.PageFilter{
+						Name: "Jack",
+						Dept: 99,
+					},
+					Page: vo.Page{
+						Orders: nil,
+						PageNo: 2,
+						Size:   10,
+					},
+				},
+			},
+			wantCode: 0,
+			wantData: vo.PageRet{},
+			wantErr:  false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			receiver := NewUsersvc()
+			gotCode, gotData, err := receiver.PageUsers(tt.args.ctx, tt.args.query)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("PageUsers() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotCode != tt.wantCode {
+				t.Errorf("PageUsers() gotCode = %v, want %v", gotCode, tt.wantCode)
+			}
+			if !reflect.DeepEqual(gotData, tt.wantData) {
+				t.Errorf("PageUsers() gotData = %v, want %v", gotData, tt.wantData)
 			}
 		})
 	}

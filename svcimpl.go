@@ -52,7 +52,22 @@ func (receiver *UsersvcImpl) UploadAvatar(ctx context.Context, avatar []*multipa
 }
 
 func (receiver *UsersvcImpl) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
-	return
+	return 0, vo.PageRet{
+		Items: []map[string]interface{}{
+			{
+				"name": "jack",
+				"age":  30,
+			},
+			{
+				"name": "rose",
+				"age":  23,
+			},
+		},
+		PageNo:   2,
+		PageSize: 10,
+		Total:    50,
+		HasNext:  true,
+	}, nil
 }
 
 func NewUsersvc(conf config.Config, db *sqlx.DB) Usersvc {
