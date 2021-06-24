@@ -38,11 +38,11 @@ require (
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1 // indirect
-	github.com/unionj-cloud/go-doudou v0.2.2-0.20210530044617-66661302f5e6
+	github.com/unionj-cloud/go-doudou v0.2.9
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
 	golang.org/x/text v0.3.6
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/resty.v1 v1.12.0
 )
 
-replace github.com/unionj-cloud/go-doudou v0.2.2-0.20210530044617-66661302f5e6 => /Users/wubin1989/workspace/cloud/go-doudou
+replace github.com/unionj-cloud/go-doudou v0.2.9 => /Users/wubin1989/workspace/cloud/go-doudou

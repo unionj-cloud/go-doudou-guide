@@ -17,10 +17,10 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
-	github.com/unionj-cloud/go-doudou v0.2.3
+	github.com/unionj-cloud/go-doudou v0.2.9
 	usersvc v0.0.0
 )
 
-replace github.com/unionj-cloud/go-doudou v0.2.3 => /Users/wubin1989/workspace/cloud/go-doudou
+replace github.com/unionj-cloud/go-doudou v0.2.9 => /Users/wubin1989/workspace/cloud/go-doudou
 
 replace usersvc v0.0.0 => /Users/wubin1989/workspace/cloud/go-doudou-guide/usersvc
