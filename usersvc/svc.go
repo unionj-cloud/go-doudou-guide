@@ -7,13 +7,13 @@ import (
 	"usersvc/vo"
 )
 
-// 用户服务接口
+// Usersvc 用户服务接口
 // v1版本
 type Usersvc interface {
-	// You can define your service methods as your need. Below is an example.
+	// PageUsers You can define your service methods as your need. Below is an example.
 	PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error)
 
-	// comment1
+	// GetUser comment1
 	// comment2
 	GetUser(ctx context.Context,
 	// 用户ID
@@ -22,12 +22,12 @@ type Usersvc interface {
 		photo string,
 	) (code int, data string, msg error)
 
-	// comment3
+	// SignUp comment3
 	SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error)
 
-	// comment4
+	// UploadAvatar comment4
 	UploadAvatar(context.Context, []*multipart.FileHeader, string) (int, string, error)
 
-	// comment5
+	// DownloadAvatar comment5
 	DownloadAvatar(ctx context.Context, userId string) (*os.File, error)
 }

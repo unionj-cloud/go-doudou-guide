@@ -3,15 +3,15 @@ package httpsrv
 import (
 	"net/http"
 
-	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
+	ddmodel "github.com/unionj-cloud/go-doudou/svc/http/model"
 )
 
 type OrdersvcHandler interface {
 	PageUsers(w http.ResponseWriter, r *http.Request)
 }
 
-func Routes(handler OrdersvcHandler) []ddhttp.Route {
-	return []ddhttp.Route{
+func Routes(handler OrdersvcHandler) []ddmodel.Route {
+	return []ddmodel.Route{
 		{
 			"PageUsers",
 			"POST",

@@ -3,7 +3,7 @@ package httpsrv
 import (
 	"net/http"
 
-	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
+	ddmodel "github.com/unionj-cloud/go-doudou/svc/http/model"
 )
 
 type UsersvcHandler interface {
@@ -14,8 +14,8 @@ type UsersvcHandler interface {
 	DownloadAvatar(w http.ResponseWriter, r *http.Request)
 }
 
-func Routes(handler UsersvcHandler) []ddhttp.Route {
-	return []ddhttp.Route{
+func Routes(handler UsersvcHandler) []ddmodel.Route {
+	return []ddmodel.Route{
 		{
 			"PageUsers",
 			"POST",
