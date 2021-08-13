@@ -14,7 +14,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
-	github.com/unionj-cloud/go-doudou v0.5.2
+	github.com/unionj-cloud/go-doudou v0.5.5
 )
 
-replace github.com/unionj-cloud/go-doudou v0.5.2 => /Users/wubin1989/workspace/cloud/go-doudou
+replace github.com/unionj-cloud/go-doudou v0.5.5 => /Users/wubin1989/workspace/cloud/go-doudou
