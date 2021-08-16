@@ -21,14 +21,6 @@ func main() {
 	}
 	logrus.Infof("Memberlist created. Local node is %s\n", node)
 
-	//ips, err := net.LookupIP("seed-2.seed-svc-headless.default.svc.cluster.local")
-	//if err != nil {
-	//	logrus.Error(err)
-	//}
-	//for _, ip := range ips {
-	//	logrus.Infoln(ip.String())
-	//}
-
 	srv := ddhttp.NewDefaultHttpSrv()
 	srv.Run()
 }

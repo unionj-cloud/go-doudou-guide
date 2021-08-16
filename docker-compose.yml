@@ -6,6 +6,9 @@ services:
       context: ./seed
       args:
         buildno: 1
+    networks:
+      testing_net:
+        ipv4_address: 172.28.1.1
 
   ordersvc:
     build:
@@ -19,6 +22,9 @@ services:
       - "6062"
     ports:
       - "6062:6062"
+    networks:
+      testing_net:
+        ipv4_address: 172.28.1.2
     depends_on:
       - seed
       - usersvc
@@ -35,6 +41,15 @@ services:
       - "6061"
     ports:
       - "6061:6061"
+    networks:
+      testing_net:
+        ipv4_address: 172.28.1.5
     depends_on:
       - seed
 
+networks:
+  testing_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
