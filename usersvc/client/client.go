@@ -10,13 +10,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	service "usersvc"
 	"usersvc/vo"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"github.com/unionj-cloud/go-doudou/fileutils"
 	"github.com/unionj-cloud/go-doudou/stringutils"
+	"github.com/unionj-cloud/go-doudou/svc/config"
 	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
 )
 
@@ -25,6 +25,13 @@ type UsersvcClient struct {
 	client   *resty.Client
 }
 
+func (receiver *UsersvcClient) SetProvider(provider ddhttp.IServiceProvider) {
+	receiver.provider = provider
+}
+
+func (receiver *UsersvcClient) SetClient(client *resty.Client) {
+	receiver.client = client
+}
 func (receiver *UsersvcClient) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
 	var (
 		_server string
@@ -38,12 +45,13 @@ func (receiver *UsersvcClient) PageUsers(ctx context.Context, query vo.PageQuery
 	_req := receiver.client.R()
 	_req.SetContext(ctx)
 	_req.SetBody(query)
+	_path := "/usersvc/pageusers"
 	if _req.Body != nil {
 		_req.SetQueryParamsFromValues(_urlValues)
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_server + "/usersvc/pageusers")
+	_resp, _err := _req.Post(_server + _path)
 	if _err != nil {
 		msg = errors.Wrap(_err, "")
 		return
@@ -81,8 +89,9 @@ func (receiver *UsersvcClient) GetUser(ctx context.Context, userId string, photo
 	_req.SetContext(ctx)
 	_urlValues.Set("userId", fmt.Sprintf("%v", userId))
 	_urlValues.Set("photo", fmt.Sprintf("%v", photo))
+	_path := "/usersvc/user"
 	_resp, _err := _req.SetQueryParamsFromValues(_urlValues).
-		Get(_server + "/usersvc/user")
+		Get(_server + _path)
 	if _err != nil {
 		msg = errors.Wrap(_err, "")
 		return
@@ -122,12 +131,13 @@ func (receiver *UsersvcClient) SignUp(ctx context.Context, username string, pass
 	_urlValues.Set("password", fmt.Sprintf("%v", password))
 	_urlValues.Set("actived", fmt.Sprintf("%v", actived))
 	_urlValues.Set("score", fmt.Sprintf("%v", score))
+	_path := "/usersvc/signup"
 	if _req.Body != nil {
 		_req.SetQueryParamsFromValues(_urlValues)
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_server + "/usersvc/signup")
+	_resp, _err := _req.Post(_server + _path)
 	if _err != nil {
 		msg = errors.Wrap(_err, "")
 		return
@@ -172,12 +182,13 @@ func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []*multipart.
 		_req.SetFileReader("pf", _fh.Filename, _f)
 	}
 	_urlValues.Set("ps", fmt.Sprintf("%v", ps))
+	_path := "/usersvc/uploadavatar"
 	if _req.Body != nil {
 		_req.SetQueryParamsFromValues(_urlValues)
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_server + "/usersvc/uploadavatar")
+	_resp, _err := _req.Post(_server + _path)
 	if _err != nil {
 		re = errors.Wrap(_err, "")
 		return
@@ -215,12 +226,13 @@ func (receiver *UsersvcClient) DownloadAvatar(ctx context.Context, userId string
 	_req.SetContext(ctx)
 	_urlValues.Set("userId", fmt.Sprintf("%v", userId))
 	_req.SetDoNotParseResponse(true)
+	_path := "/usersvc/downloadavatar"
 	if _req.Body != nil {
 		_req.SetQueryParamsFromValues(_urlValues)
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_server + "/usersvc/downloadavatar")
+	_resp, _err := _req.Post(_server + _path)
 	if _err != nil {
 		re = errors.Wrap(_err, "")
 		return
@@ -231,7 +243,7 @@ func (receiver *UsersvcClient) DownloadAvatar(ctx context.Context, userId string
 	}
 	_disp := _resp.Header().Get("Content-Disposition")
 	_file := strings.TrimPrefix(_disp, "attachment; filename=")
-	_output := os.Getenv("OUTPUT")
+	_output := config.GddOutput.Load()
 	if stringutils.IsNotEmpty(_output) {
 		_file = _output + string(filepath.Separator) + _file
 	}
@@ -256,22 +268,8 @@ func (receiver *UsersvcClient) DownloadAvatar(ctx context.Context, userId string
 	return
 }
 
-type UsersvcClientOption func(*UsersvcClient)
-
-func WithProvider(provider ddhttp.IServiceProvider) UsersvcClientOption {
-	return func(a *UsersvcClient) {
-		a.provider = provider
-	}
-}
-
-func WithClient(client *resty.Client) UsersvcClientOption {
-	return func(a *UsersvcClient) {
-		a.client = client
-	}
-}
-
-func NewUsersvc(opts ...UsersvcClientOption) service.Usersvc {
-	defaultProvider := ddhttp.NewServiceProvider("Usersvc")
+func NewUsersvc(opts ...ddhttp.DdClientOption) *UsersvcClient {
+	defaultProvider := ddhttp.NewServiceProvider("USERSVC")
 	defaultClient := ddhttp.NewClient()
 
 	svcClient := &UsersvcClient{

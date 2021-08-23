@@ -15,7 +15,7 @@ func Routes(handler OrdersvcHandler) []ddmodel.Route {
 		{
 			"PageUsers",
 			"POST",
-			"/ordersvc/pageusers",
+			"/page/users",
 			handler.PageUsers,
 		},
 	}

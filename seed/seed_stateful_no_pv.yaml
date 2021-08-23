@@ -5,10 +5,10 @@ metadata:
 spec:
   selector:
     app: seed
-#  ports:
-#    - protocol: TCP
-#      port: 80
-#      targetPort: 8080
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
   clusterIP: None
 ---
 apiVersion: apps/v1
@@ -30,7 +30,7 @@ spec:
       containers:
         - name: seed
           image: wubin1989/go-doudou-guide-seed:latest
-#          ports:
-#            - containerPort: 80
-#              name: http
-#              protocol: TCP
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP

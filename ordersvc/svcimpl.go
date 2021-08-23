@@ -11,7 +11,7 @@ import (
 )
 
 type OrdersvcImpl struct {
-	conf          config.Config
+	conf          *config.Config
 	usersvcClient service.Usersvc
 }
 
@@ -29,7 +29,7 @@ func (receiver *OrdersvcImpl) PageUsers(ctx context.Context, query vo.PageQuery)
 	return
 }
 
-func NewOrdersvc(conf config.Config, db *sqlx.DB, usersvcClient service.Usersvc) Ordersvc {
+func NewOrdersvc(conf *config.Config, db *sqlx.DB, usersvcClient service.Usersvc) Ordersvc {
 	return &OrdersvcImpl{
 		conf,
 		usersvcClient,
