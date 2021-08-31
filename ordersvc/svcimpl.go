@@ -15,6 +15,18 @@ type OrdersvcImpl struct {
 	usersvcClient service.Usersvc
 }
 
+func (receiver *OrdersvcImpl) GetGreeting(ctx context.Context, hello string) (ret string, err error) {
+	return hello, nil
+}
+
+func (receiver *OrdersvcImpl) GetHelloWorld(ctx context.Context) (ret string, err error) {
+	return "Hello World", nil
+}
+
+func (receiver *OrdersvcImpl) GetHello(ctx context.Context) (ret string, err error) {
+	return "world", nil
+}
+
 func (receiver *OrdersvcImpl) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
 	var _data vo1.PageRet
 	code, _data, msg = receiver.usersvcClient.PageUsers(ctx, vo1.PageQuery{

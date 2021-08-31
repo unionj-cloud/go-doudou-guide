@@ -18,7 +18,7 @@ func (receiver *OrdersvcHandlerImpl) PageUsers(_writer http.ResponseWriter, _req
 		query vo.PageQuery
 		code  int
 		data  vo.PageRet
-		msg   error
+		err   error
 	)
 	ctx = _req.Context()
 	if err := json.NewDecoder(_req.Body).Decode(&query); err != nil {
@@ -26,15 +26,15 @@ func (receiver *OrdersvcHandlerImpl) PageUsers(_writer http.ResponseWriter, _req
 		return
 	}
 	defer _req.Body.Close()
-	code, data, msg = receiver.ordersvc.PageUsers(
+	code, data, err = receiver.ordersvc.PageUsers(
 		ctx,
 		query,
 	)
-	if msg != nil {
-		if msg == context.Canceled {
-			http.Error(_writer, msg.Error(), http.StatusBadRequest)
+	if err != nil {
+		if err == context.Canceled {
+			http.Error(_writer, err.Error(), http.StatusBadRequest)
 		} else {
-			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
+			http.Error(_writer, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
@@ -53,5 +53,92 @@ func (receiver *OrdersvcHandlerImpl) PageUsers(_writer http.ResponseWriter, _req
 func NewOrdersvcHandler(ordersvc service.Ordersvc) OrdersvcHandler {
 	return &OrdersvcHandlerImpl{
 		ordersvc,
+	}
+}
+
+func (receiver *OrdersvcHandlerImpl) GetHello(_writer http.ResponseWriter, _req *http.Request) {
+	var (
+		ctx context.Context
+		ret string
+		err error
+	)
+	ctx = _req.Context()
+	ret, err = receiver.ordersvc.GetHello(
+		ctx,
+	)
+	if err != nil {
+		if err == context.Canceled {
+			http.Error(_writer, err.Error(), http.StatusBadRequest)
+		} else {
+			http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if err := json.NewEncoder(_writer).Encode(struct {
+		Ret string `json:"ret,omitempty"`
+	}{
+		Ret: ret,
+	}); err != nil {
+		http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (receiver *OrdersvcHandlerImpl) GetHelloWorld(_writer http.ResponseWriter, _req *http.Request) {
+	var (
+		ctx context.Context
+		ret string
+		err error
+	)
+	ctx = _req.Context()
+	ret, err = receiver.ordersvc.GetHelloWorld(
+		ctx,
+	)
+	if err != nil {
+		if err == context.Canceled {
+			http.Error(_writer, err.Error(), http.StatusBadRequest)
+		} else {
+			http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if err := json.NewEncoder(_writer).Encode(struct {
+		Ret string `json:"ret,omitempty"`
+	}{
+		Ret: ret,
+	}); err != nil {
+		http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (receiver *OrdersvcHandlerImpl) GetGreeting(_writer http.ResponseWriter, _req *http.Request) {
+	var (
+		ctx   context.Context
+		hello string
+		ret   string
+		err   error
+	)
+	ctx = _req.Context()
+	hello = _req.FormValue("hello")
+	ret, err = receiver.ordersvc.GetGreeting(
+		ctx,
+		hello,
+	)
+	if err != nil {
+		if err == context.Canceled {
+			http.Error(_writer, err.Error(), http.StatusBadRequest)
+		} else {
+			http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if err := json.NewEncoder(_writer).Encode(struct {
+		Ret string `json:"ret,omitempty"`
+	}{
+		Ret: ret,
+	}); err != nil {
+		http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
