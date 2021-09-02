@@ -23,7 +23,6 @@ type Usersvc interface {
 	UploadAvatar(context.Context, []*multipart.FileHeader, string) (int, string, error)
 
 	// UploadAvatar demonstrate how to define upload files api
-	// there must be one []*multipart.FileHeader or *multipart.FileHeader parameter among output parameters
 	UploadAvatar2(context.Context, []*multipart.FileHeader, string, *multipart.FileHeader, *multipart.FileHeader) (int, string, error)
 
 	// GetDownloadAvatar demonstrate how to define download file api
