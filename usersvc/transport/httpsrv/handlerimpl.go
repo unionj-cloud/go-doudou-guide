@@ -11,6 +11,7 @@ import (
 	service "usersvc"
 	"usersvc/vo"
 
+	"github.com/pkg/errors"
 	_cast "github.com/unionj-cloud/cast"
 )
 
@@ -37,7 +38,7 @@ func (receiver *UsersvcHandlerImpl) PageUsers(_writer http.ResponseWriter, _req 
 		query,
 	)
 	if msg != nil {
-		if msg == context.Canceled {
+		if errors.Is(msg, context.Canceled) {
 			http.Error(_writer, msg.Error(), http.StatusBadRequest)
 		} else {
 			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
@@ -73,7 +74,7 @@ func (receiver *UsersvcHandlerImpl) GetUser(_writer http.ResponseWriter, _req *h
 		photo,
 	)
 	if msg != nil {
-		if msg == context.Canceled {
+		if errors.Is(msg, context.Canceled) {
 			http.Error(_writer, msg.Error(), http.StatusBadRequest)
 		} else {
 			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
@@ -130,7 +131,7 @@ func (receiver *UsersvcHandlerImpl) SignUp(_writer http.ResponseWriter, _req *ht
 		score,
 	)
 	if msg != nil {
-		if msg == context.Canceled {
+		if errors.Is(msg, context.Canceled) {
 			http.Error(_writer, msg.Error(), http.StatusBadRequest)
 		} else {
 			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
@@ -171,7 +172,7 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar(_writer http.ResponseWriter, _r
 		ps,
 	)
 	if re != nil {
-		if re == context.Canceled {
+		if errors.Is(re, context.Canceled) {
 			http.Error(_writer, re.Error(), http.StatusBadRequest)
 		} else {
 			http.Error(_writer, re.Error(), http.StatusInternalServerError)
@@ -189,50 +190,6 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar(_writer http.ResponseWriter, _r
 		return
 	}
 }
-func (receiver *UsersvcHandlerImpl) GetDownloadAvatar(_writer http.ResponseWriter, _req *http.Request) {
-	var (
-		ctx    context.Context
-		userId string
-		rs     string
-		rf     *os.File
-		re     error
-	)
-	ctx = _req.Context()
-	userId = _req.FormValue("userId")
-	rs, rf, re = receiver.usersvc.GetDownloadAvatar(
-		ctx,
-		userId,
-	)
-	if re != nil {
-		if re == context.Canceled {
-			http.Error(_writer, re.Error(), http.StatusBadRequest)
-		} else {
-			http.Error(_writer, re.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-	if rf == nil {
-		http.Error(_writer, "No file returned", http.StatusInternalServerError)
-		return
-	}
-	var _fi os.FileInfo
-	_fi, _err := rf.Stat()
-	if _err != nil {
-		http.Error(_writer, _err.Error(), http.StatusInternalServerError)
-		return
-	}
-	_writer.Header().Set("Content-Disposition", "inline; filename="+_fi.Name())
-	_writer.Header().Set("Content-Type", rs)
-	_writer.Header().Set("Content-Length", fmt.Sprintf("%d", _fi.Size()))
-	io.Copy(_writer, rf)
-}
-
-func NewUsersvcHandler(usersvc service.Usersvc) UsersvcHandler {
-	return &UsersvcHandlerImpl{
-		usersvc,
-	}
-}
-
 func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _req *http.Request) {
 	var (
 		pc  context.Context
@@ -276,7 +233,7 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _
 		pf3,
 	)
 	if re != nil {
-		if re == context.Canceled {
+		if errors.Is(re, context.Canceled) {
 			http.Error(_writer, re.Error(), http.StatusBadRequest)
 		} else {
 			http.Error(_writer, re.Error(), http.StatusInternalServerError)
@@ -292,5 +249,48 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _
 	}); err != nil {
 		http.Error(_writer, err.Error(), http.StatusInternalServerError)
 		return
+	}
+}
+func (receiver *UsersvcHandlerImpl) GetDownloadAvatar(_writer http.ResponseWriter, _req *http.Request) {
+	var (
+		ctx    context.Context
+		userId string
+		rs     string
+		rf     *os.File
+		re     error
+	)
+	ctx = _req.Context()
+	userId = _req.FormValue("userId")
+	rs, rf, re = receiver.usersvc.GetDownloadAvatar(
+		ctx,
+		userId,
+	)
+	if re != nil {
+		if errors.Is(re, context.Canceled) {
+			http.Error(_writer, re.Error(), http.StatusBadRequest)
+		} else {
+			http.Error(_writer, re.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if rf == nil {
+		http.Error(_writer, "No file returned", http.StatusInternalServerError)
+		return
+	}
+	var _fi os.FileInfo
+	_fi, _err := rf.Stat()
+	if _err != nil {
+		http.Error(_writer, _err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_writer.Header().Set("Content-Disposition", "inline; filename="+_fi.Name())
+	_writer.Header().Set("Content-Type", rs)
+	_writer.Header().Set("Content-Length", fmt.Sprintf("%d", _fi.Size()))
+	io.Copy(_writer, rf)
+}
+
+func NewUsersvcHandler(usersvc service.Usersvc) UsersvcHandler {
+	return &UsersvcHandlerImpl{
+		usersvc,
 	}
 }
