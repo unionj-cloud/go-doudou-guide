@@ -5,34 +5,16 @@ import (
 	"github.com/ascarter/requestid"
 	"github.com/gorilla/handlers"
 	"github.com/sirupsen/logrus"
-	"github.com/unionj-cloud/go-doudou/pathutils"
 	ddconfig "github.com/unionj-cloud/go-doudou/svc/config"
 	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
 	"github.com/unionj-cloud/go-doudou/svc/registry"
 	service "usersvc"
 	"usersvc/config"
-	"usersvc/db"
 	"usersvc/transport/httpsrv"
 )
 
 func main() {
-	env := config.NewDotenv(pathutils.Abs("../.env"))
-	conf := env.Get()
-
-	conn, err := db.NewDb(conf.DbConf)
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if conn == nil {
-			return
-		}
-		if err := conn.Close(); err == nil {
-			logrus.Infoln("Database connection is closed")
-		} else {
-			logrus.Warnln("Failed to close database connection")
-		}
-	}()
+	conf := config.LoadFromEnv()
 
 	if ddconfig.GddMode.Load() == "micro" {
 		node, err := registry.NewNode()
@@ -42,7 +24,7 @@ func main() {
 		logrus.Infof("Memberlist created. Local node is %s\n", node)
 	}
 
-	svc := service.NewUsersvc(conf, conn)
+	svc := service.NewUsersvc(conf)
 
 	handler := httpsrv.NewUsersvcHandler(svc)
 	srv := ddhttp.NewDefaultHttpSrv()

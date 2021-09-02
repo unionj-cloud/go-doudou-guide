@@ -11,7 +11,7 @@ import (
 	service "usersvc"
 	"usersvc/vo"
 
-	"github.com/unionj-cloud/go-doudou/cast"
+	_cast "github.com/unionj-cloud/cast"
 )
 
 type UsersvcHandlerImpl struct {
@@ -104,19 +104,19 @@ func (receiver *UsersvcHandlerImpl) SignUp(_writer http.ResponseWriter, _req *ht
 	)
 	ctx = _req.Context()
 	username = _req.FormValue("username")
-	if casted, err := cast.ToIntE(_req.FormValue("password")); err != nil {
+	if casted, err := _cast.ToIntE(_req.FormValue("password")); err != nil {
 		http.Error(_writer, err.Error(), http.StatusBadRequest)
 		return
 	} else {
 		password = casted
 	}
-	if casted, err := cast.ToBoolE(_req.FormValue("actived")); err != nil {
+	if casted, err := _cast.ToBoolE(_req.FormValue("actived")); err != nil {
 		http.Error(_writer, err.Error(), http.StatusBadRequest)
 		return
 	} else {
 		actived = casted
 	}
-	if casted, err := cast.ToFloat64E(_req.FormValue("score")); err != nil {
+	if casted, err := _cast.ToFloat64E(_req.FormValue("score")); err != nil {
 		http.Error(_writer, err.Error(), http.StatusBadRequest)
 		return
 	} else {
@@ -189,16 +189,17 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar(_writer http.ResponseWriter, _r
 		return
 	}
 }
-func (receiver *UsersvcHandlerImpl) DownloadAvatar(_writer http.ResponseWriter, _req *http.Request) {
+func (receiver *UsersvcHandlerImpl) GetDownloadAvatar(_writer http.ResponseWriter, _req *http.Request) {
 	var (
 		ctx    context.Context
 		userId string
+		rs     string
 		rf     *os.File
 		re     error
 	)
 	ctx = _req.Context()
 	userId = _req.FormValue("userId")
-	rf, re = receiver.usersvc.DownloadAvatar(
+	rs, rf, re = receiver.usersvc.GetDownloadAvatar(
 		ctx,
 		userId,
 	)
@@ -220,8 +221,8 @@ func (receiver *UsersvcHandlerImpl) DownloadAvatar(_writer http.ResponseWriter, 
 		http.Error(_writer, _err.Error(), http.StatusInternalServerError)
 		return
 	}
-	_writer.Header().Set("Content-Disposition", "attachment; filename="+_fi.Name())
-	_writer.Header().Set("Content-Type", "application/octet-stream")
+	_writer.Header().Set("Content-Disposition", "inline; filename="+_fi.Name())
+	_writer.Header().Set("Content-Type", rs)
 	_writer.Header().Set("Content-Length", fmt.Sprintf("%d", _fi.Size()))
 	io.Copy(_writer, rf)
 }
@@ -229,5 +230,67 @@ func (receiver *UsersvcHandlerImpl) DownloadAvatar(_writer http.ResponseWriter, 
 func NewUsersvcHandler(usersvc service.Usersvc) UsersvcHandler {
 	return &UsersvcHandlerImpl{
 		usersvc,
+	}
+}
+
+func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _req *http.Request) {
+	var (
+		pc  context.Context
+		pf  []*multipart.FileHeader
+		ps  string
+		pf2 *multipart.FileHeader
+		pf3 *multipart.FileHeader
+		ri  int
+		rs  string
+		re  error
+	)
+	pc = _req.Context()
+	if err := _req.ParseMultipartForm(32 << 20); err != nil {
+		http.Error(_writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+	pfFiles := _req.MultipartForm.File["pf"]
+	pf = pfFiles
+	ps = _req.FormValue("ps")
+	if err := _req.ParseMultipartForm(32 << 20); err != nil {
+		http.Error(_writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+	pf2Files := _req.MultipartForm.File["pf2"]
+	if len(pf2Files) > 0 {
+		pf2 = pf2Files[0]
+	}
+	if err := _req.ParseMultipartForm(32 << 20); err != nil {
+		http.Error(_writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+	pf3Files := _req.MultipartForm.File["pf3"]
+	if len(pf3Files) > 0 {
+		pf3 = pf3Files[0]
+	}
+	ri, rs, re = receiver.usersvc.UploadAvatar2(
+		pc,
+		pf,
+		ps,
+		pf2,
+		pf3,
+	)
+	if re != nil {
+		if re == context.Canceled {
+			http.Error(_writer, re.Error(), http.StatusBadRequest)
+		} else {
+			http.Error(_writer, re.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if err := json.NewEncoder(_writer).Encode(struct {
+		Ri int    `json:"ri"`
+		Rs string `json:"rs"`
+	}{
+		Ri: ri,
+		Rs: rs,
+	}); err != nil {
+		http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }

@@ -15,21 +15,7 @@ import (
 
 func main() {
 	conf := config.LoadFromEnv()
-	//conn, err := db.NewDb(conf.DbConf)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//defer func() {
-	//	if conn == nil {
-	//		return
-	//	}
-	//	if err := conn.Close(); err == nil {
-	//		logrus.Infoln("Database connection is closed")
-	//	} else {
-	//		logrus.Warnln("Failed to close database connection")
-	//	}
-	//}()
-
+	
 	node, err := registry.NewNode()
 	if err != nil {
 		logrus.Panicln(fmt.Sprintf("%+v", err))

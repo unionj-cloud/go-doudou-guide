@@ -7,27 +7,26 @@ import (
 	"usersvc/vo"
 )
 
-// Usersvc 用户服务接口
-// v1版本
+// Usersvc User Center Service
 type Usersvc interface {
-	// PageUsers You can define your service methods as your need. Below is an example.
+	// PageUsers demonstrate how to define POST and Content-Type as application/json api
 	PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error)
 
-	// GetUser comment1
-	// comment2
-	GetUser(ctx context.Context,
-	// 用户ID
-		userId string,
-	// 图片地址
-		photo string,
-	) (code int, data string, msg error)
+	// GetUser demonstrate how to define GET api with query string parameters
+	GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error)
 
-	// SignUp comment3
+	// SignUp demonstrate how to define POST and Content-Type as application/x-www-form-urlencoded api
 	SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error)
 
-	// UploadAvatar comment4
+	// UploadAvatar demonstrate how to define upload files api
+	// there must be one []*multipart.FileHeader or *multipart.FileHeader parameter among output parameters
 	UploadAvatar(context.Context, []*multipart.FileHeader, string) (int, string, error)
 
-	// DownloadAvatar comment5
-	DownloadAvatar(ctx context.Context, userId string) (*os.File, error)
+	// UploadAvatar demonstrate how to define upload files api
+	// there must be one []*multipart.FileHeader or *multipart.FileHeader parameter among output parameters
+	UploadAvatar2(context.Context, []*multipart.FileHeader, string, *multipart.FileHeader, *multipart.FileHeader) (int, string, error)
+
+	// GetDownloadAvatar demonstrate how to define download file api
+	// there must be *os.File parameter among output parameters
+	GetDownloadAvatar(ctx context.Context, userId string) (string, *os.File, error)
 }
