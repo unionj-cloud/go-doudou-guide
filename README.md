@@ -9,7 +9,7 @@ This is a demo project for showing how go-doudou can help you.
 Install go-doudou
 
 ```shell
-go get -v -u github.com/unionj-cloud/go-doudou/...@v0.6.4
+go get -v github.com/unionj-cloud/go-doudou@v0.7.3
 ```
 
 
