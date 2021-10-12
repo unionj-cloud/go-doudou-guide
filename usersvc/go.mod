@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee
+	github.com/brianvoe/gofakeit/v6 v6.9.0
 	github.com/go-resty/resty/v2 v2.6.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/handlers v1.5.1
@@ -16,3 +17,5 @@ require (
 	github.com/unionj-cloud/cast v1.3.2
 	github.com/unionj-cloud/go-doudou v0.6.4
 )
+
+replace github.com/unionj-cloud/go-doudou v0.6.4 => /Users/wubin1989/workspace/cloud/go-doudou

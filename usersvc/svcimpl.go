@@ -2,9 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/go-resty/resty/v2"
-	"github.com/pkg/errors"
-	ddconfig "github.com/unionj-cloud/go-doudou/svc/config"
 	"io"
 	"mime/multipart"
 	"os"
@@ -12,6 +9,11 @@ import (
 	"time"
 	"usersvc/config"
 	"usersvc/vo"
+
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/go-resty/resty/v2"
+	"github.com/pkg/errors"
+	ddconfig "github.com/unionj-cloud/go-doudou/svc/config"
 )
 
 type UsersvcImpl struct {
@@ -47,14 +49,6 @@ func (receiver *UsersvcImpl) UploadAvatar2(ctx context.Context, headers []*multi
 		return 1, "", errors.Wrapf(err, "call saveFile error")
 	}
 	return 0, "OK", nil
-}
-
-func (receiver *UsersvcImpl) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
-	panic("implement me")
-}
-
-func (receiver *UsersvcImpl) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
-	panic("implement me")
 }
 
 func (receiver *UsersvcImpl) GetDownloadAvatar(ctx context.Context, userId string) (string, *os.File, error) {
@@ -131,4 +125,21 @@ func NewUsersvc(conf *config.Config) Usersvc {
 	return &UsersvcImpl{
 		conf,
 	}
+}
+
+func (receiver *UsersvcImpl) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
+	var _result struct {
+		Code int
+		Data string
+	}
+	_ = gofakeit.Struct(&_result)
+	return _result.Code, _result.Data, nil
+}
+func (receiver *UsersvcImpl) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
+	var _result struct {
+		Code int
+		Data string
+	}
+	_ = gofakeit.Struct(&_result)
+	return _result.Code, _result.Data, nil
 }
