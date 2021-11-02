@@ -17,3 +17,5 @@ require (
 	github.com/unionj-cloud/cast v1.3.2
 	github.com/unionj-cloud/go-doudou v0.7.3
 )
+
+replace github.com/unionj-cloud/go-doudou v0.7.3 => /Users/wubin1989/workspace/cloud/go-doudou

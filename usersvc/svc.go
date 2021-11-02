@@ -19,7 +19,7 @@ type Usersvc interface {
 	SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error)
 
 	// UploadAvatar demonstrate how to define upload files api
-	// there must be one []*multipart.FileHeader or *multipart.FileHeader parameter among output parameters
+	// there must be one []*multipart.FileHeader or *multipart.FileHeader parameter among input parameters
 	UploadAvatar(context.Context, []*multipart.FileHeader, string) (int, string, error)
 
 	// UploadAvatar demonstrate how to define upload files api

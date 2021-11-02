@@ -22,7 +22,7 @@ func main() {
 	}
 	logrus.Infof("%s joined cluster\n", node.String())
 
-	usersvcProvider := ddhttp.NewMemberlistServiceProvider("usersvc", node)
+	usersvcProvider := ddhttp.NewMemberlistServiceProvider("github.com/usersvc", node)
 	usersvcClient := client.NewUsersvc(ddhttp.WithProvider(usersvcProvider))
 
 	svc := service.NewOrdersvc(conf, nil, usersvcClient)
