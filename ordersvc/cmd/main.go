@@ -5,6 +5,7 @@ import (
 	"github.com/ascarter/requestid"
 	"github.com/gorilla/handlers"
 	"github.com/sirupsen/logrus"
+	ddconfig "github.com/unionj-cloud/go-doudou/svc/config"
 	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
 	"github.com/unionj-cloud/go-doudou/svc/registry"
 	service "ordersvc"
@@ -14,8 +15,9 @@ import (
 )
 
 func main() {
+	ddconfig.InitEnv()
 	conf := config.LoadFromEnv()
-	
+
 	node, err := registry.NewNode()
 	if err != nil {
 		logrus.Panicln(fmt.Sprintf("%+v", err))

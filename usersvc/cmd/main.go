@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+	ddconfig.InitEnv()
 	conf := config.LoadFromEnv()
 
 	if ddconfig.GddMode.Load() == "micro" {
