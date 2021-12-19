@@ -17,13 +17,11 @@ func main() {
 	ddconfig.InitEnv()
 	conf := config.LoadFromEnv()
 
-	if ddconfig.GddMode.Load() == "micro" {
-		node, err := registry.NewNode()
-		if err != nil {
-			logrus.Panicln(fmt.Sprintf("%+v", err))
-		}
-		logrus.Infof("Memberlist created. Local node is %s\n", node)
+	err := registry.NewNode()
+	if err != nil {
+		logrus.Panicln(fmt.Sprintf("%+v", err))
 	}
+	defer registry.Shutdown()
 
 	svc := service.NewUsersvc(conf)
 

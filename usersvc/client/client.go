@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/unionj-cloud/go-doudou/svc/registry"
 	"io"
 	"mime/multipart"
 	"net/url"
@@ -21,11 +22,11 @@ import (
 )
 
 type UsersvcClient struct {
-	provider ddhttp.IServiceProvider
+	provider registry.IServiceProvider
 	client   *resty.Client
 }
 
-func (receiver *UsersvcClient) SetProvider(provider ddhttp.IServiceProvider) {
+func (receiver *UsersvcClient) SetProvider(provider registry.IServiceProvider) {
 	receiver.provider = provider
 }
 

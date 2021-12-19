@@ -18,13 +18,13 @@ func main() {
 	ddconfig.InitEnv()
 	conf := config.LoadFromEnv()
 
-	node, err := registry.NewNode()
+	err := registry.NewNode()
 	if err != nil {
 		logrus.Panicln(fmt.Sprintf("%+v", err))
 	}
-	logrus.Infof("%s joined cluster\n", node.String())
+	defer registry.Shutdown()
 
-	usersvcProvider := ddhttp.NewMemberlistServiceProvider("github.com/usersvc", node)
+	usersvcProvider := ddhttp.NewSmoothWeightedRoundRobinProvider("github.com/usersvc")
 	usersvcClient := client.NewUsersvc(ddhttp.WithProvider(usersvcProvider))
 
 	svc := service.NewOrdersvc(conf, nil, usersvcClient)

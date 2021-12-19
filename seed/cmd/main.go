@@ -10,12 +10,11 @@ import (
 
 func main() {
 	ddconfig.InitEnv()
-	node, err := registry.NewNode()
+	err := registry.NewNode()
 	if err != nil {
 		logrus.Panicln(fmt.Sprintf("%+v", err))
 	}
-	logrus.Infof("Memberlist created. Local node is %s\n", node)
-
+	defer registry.Shutdown()
 	srv := ddhttp.NewDefaultHttpSrv()
 	srv.Run()
 }

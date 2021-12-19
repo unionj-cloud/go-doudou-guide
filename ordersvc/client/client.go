@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/unionj-cloud/go-doudou/svc/registry"
 	"net/url"
 	"ordersvc/vo"
 
@@ -14,11 +15,11 @@ import (
 )
 
 type OrdersvcClient struct {
-	provider ddhttp.IServiceProvider
+	provider registry.IServiceProvider
 	client   *resty.Client
 }
 
-func (receiver *OrdersvcClient) SetProvider(provider ddhttp.IServiceProvider) {
+func (receiver *OrdersvcClient) SetProvider(provider registry.IServiceProvider) {
 	receiver.provider = provider
 }
 
