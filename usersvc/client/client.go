@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/unionj-cloud/go-doudou/svc/registry"
 	"io"
 	"mime/multipart"
 	"net/url"
@@ -19,6 +18,7 @@ import (
 	"github.com/unionj-cloud/go-doudou/stringutils"
 	"github.com/unionj-cloud/go-doudou/svc/config"
 	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
+	"github.com/unionj-cloud/go-doudou/svc/registry"
 )
 
 type UsersvcClient struct {
@@ -34,14 +34,7 @@ func (receiver *UsersvcClient) SetClient(client *resty.Client) {
 	receiver.client = client
 }
 func (receiver *UsersvcClient) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
-	var (
-		_server string
-		_err    error
-	)
-	if _server, _err = receiver.provider.SelectServer(); _err != nil {
-		msg = errors.Wrap(_err, "")
-		return
-	}
+	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
 	_req.SetContext(ctx)
@@ -52,7 +45,7 @@ func (receiver *UsersvcClient) PageUsers(ctx context.Context, query vo.PageQuery
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_server + _path)
+	_resp, _err := _req.Post(_path)
 	if _err != nil {
 		msg = errors.Wrap(_err, "")
 		return
@@ -77,14 +70,7 @@ func (receiver *UsersvcClient) PageUsers(ctx context.Context, query vo.PageQuery
 	return _result.Code, _result.Data, nil
 }
 func (receiver *UsersvcClient) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
-	var (
-		_server string
-		_err    error
-	)
-	if _server, _err = receiver.provider.SelectServer(); _err != nil {
-		msg = errors.Wrap(_err, "")
-		return
-	}
+	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
 	_req.SetContext(ctx)
@@ -92,7 +78,7 @@ func (receiver *UsersvcClient) GetUser(ctx context.Context, userId string, photo
 	_urlValues.Set("photo", fmt.Sprintf("%v", photo))
 	_path := "/user"
 	_resp, _err := _req.SetQueryParamsFromValues(_urlValues).
-		Get(_server + _path)
+		Get(_path)
 	if _err != nil {
 		msg = errors.Wrap(_err, "")
 		return
@@ -117,14 +103,7 @@ func (receiver *UsersvcClient) GetUser(ctx context.Context, userId string, photo
 	return _result.Code, _result.Data, nil
 }
 func (receiver *UsersvcClient) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
-	var (
-		_server string
-		_err    error
-	)
-	if _server, _err = receiver.provider.SelectServer(); _err != nil {
-		msg = errors.Wrap(_err, "")
-		return
-	}
+	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
 	_req.SetContext(ctx)
@@ -138,7 +117,7 @@ func (receiver *UsersvcClient) SignUp(ctx context.Context, username string, pass
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_server + _path)
+	_resp, _err := _req.Post(_path)
 	if _err != nil {
 		msg = errors.Wrap(_err, "")
 		return
@@ -163,14 +142,7 @@ func (receiver *UsersvcClient) SignUp(ctx context.Context, username string, pass
 	return _result.Code, _result.Data, nil
 }
 func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []*multipart.FileHeader, ps string) (ri int, rs string, re error) {
-	var (
-		_server string
-		_err    error
-	)
-	if _server, _err = receiver.provider.SelectServer(); _err != nil {
-		re = errors.Wrap(_err, "")
-		return
-	}
+	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
 	_req.SetContext(pc)
@@ -189,7 +161,7 @@ func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []*multipart.
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_server + _path)
+	_resp, _err := _req.Post(_path)
 	if _err != nil {
 		re = errors.Wrap(_err, "")
 		return
@@ -214,14 +186,7 @@ func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []*multipart.
 	return _result.Ri, _result.Rs, nil
 }
 func (receiver *UsersvcClient) UploadAvatar2(pc context.Context, pf []*multipart.FileHeader, ps string, pf2 *multipart.FileHeader, pf3 *multipart.FileHeader) (ri int, rs string, re error) {
-	var (
-		_server string
-		_err    error
-	)
-	if _server, _err = receiver.provider.SelectServer(); _err != nil {
-		re = errors.Wrap(_err, "")
-		return
-	}
+	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
 	_req.SetContext(pc)
@@ -252,7 +217,7 @@ func (receiver *UsersvcClient) UploadAvatar2(pc context.Context, pf []*multipart
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_server + _path)
+	_resp, _err := _req.Post(_path)
 	if _err != nil {
 		re = errors.Wrap(_err, "")
 		return
@@ -277,14 +242,7 @@ func (receiver *UsersvcClient) UploadAvatar2(pc context.Context, pf []*multipart
 	return _result.Ri, _result.Rs, nil
 }
 func (receiver *UsersvcClient) GetDownloadAvatar(ctx context.Context, userId string) (rs string, rf *os.File, re error) {
-	var (
-		_server string
-		_err    error
-	)
-	if _server, _err = receiver.provider.SelectServer(); _err != nil {
-		re = errors.Wrap(_err, "")
-		return
-	}
+	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
 	_req.SetContext(ctx)
@@ -292,7 +250,7 @@ func (receiver *UsersvcClient) GetDownloadAvatar(ctx context.Context, userId str
 	_req.SetDoNotParseResponse(true)
 	_path := "/download/avatar"
 	_resp, _err := _req.SetQueryParamsFromValues(_urlValues).
-		Get(_server + _path)
+		Get(_path)
 	if _err != nil {
 		re = errors.Wrap(_err, "")
 		return
@@ -340,6 +298,11 @@ func NewUsersvc(opts ...ddhttp.DdClientOption) *UsersvcClient {
 	for _, opt := range opts {
 		opt(svcClient)
 	}
+
+	svcClient.client.OnBeforeRequest(func(client *resty.Client, request *resty.Request) error {
+		client.SetHostURL(svcClient.provider.SelectServer())
+		return nil
+	})
 
 	return svcClient
 }
