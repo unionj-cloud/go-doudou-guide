@@ -21,7 +21,7 @@ func main() {
 	if err != nil {
 		logrus.Panicln(fmt.Sprintf("%+v", err))
 	}
-	//defer registry.Shutdown()
+	defer registry.Shutdown()
 
 	svc := service.NewUsersvc(conf)
 
