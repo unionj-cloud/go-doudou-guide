@@ -229,10 +229,22 @@ import (
 // Usersvc User Center Service
 type Usersvc interface {
 	// PageUsers demonstrate how to define POST and Content-Type as application/json api
-	PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error)
+	PageUsers(ctx context.Context,
+	// comments above input and output struct type parameters in vo package will display on online document
+	// not comments here
+		query vo.PageQuery) (
+	// it indicates there is an error if code is not 0
+		code int,
+	// page data
+		data vo.PageRet,
+	// error message
+		msg error)
 
 	// GetUser demonstrate how to define GET api with query string parameters
-	GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error)
+	GetUser(ctx context.Context,
+	// user id
+	// comments above input and output basic type parameters will display on online document
+		userId string, photo string) (code int, data string, msg error)
 
 	// SignUp demonstrate how to define POST and Content-Type as application/x-www-form-urlencoded api
 	SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error)
@@ -255,7 +267,9 @@ type Usersvc interface {
 	// if you add it, you should make a small fix manually to replace application/octet-stream with it.
 	// Any custom manual fix in handlerimpl.go file won't been overwritten when you re-execute go-doudou commands
 	// like go-doudou svc http --handler -c go --doc
+	// go-doudou will ignore any output parameter other than *os.File when generate OpenAPI 3.0 json file and online document
 		string,
+	// download file
 		*os.File, error)
 }
 ```
