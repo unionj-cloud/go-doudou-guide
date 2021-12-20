@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"mime/multipart"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -15,6 +14,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"github.com/unionj-cloud/go-doudou/fileutils"
+	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"
 	"github.com/unionj-cloud/go-doudou/stringutils"
 	"github.com/unionj-cloud/go-doudou/svc/config"
 	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
@@ -141,18 +141,13 @@ func (receiver *UsersvcClient) SignUp(ctx context.Context, username string, pass
 	}
 	return _result.Code, _result.Data, nil
 }
-func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []*multipart.FileHeader, ps string) (ri int, rs string, re error) {
+func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []*v3.FileModel, ps string) (ri int, rs string, re error) {
 	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
 	_req.SetContext(pc)
-	for _, _fh := range pf {
-		_f, _err := _fh.Open()
-		if _err != nil {
-			re = errors.Wrap(_err, "")
-			return
-		}
-		_req.SetFileReader("pf", _fh.Filename, _f)
+	for _, _f := range pf {
+		_req.SetFileReader("pf", _f.Filename, _f.Reader)
 	}
 	_urlValues.Set("ps", fmt.Sprintf("%v", ps))
 	_path := "/upload/avatar"
@@ -185,32 +180,17 @@ func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []*multipart.
 	}
 	return _result.Ri, _result.Rs, nil
 }
-func (receiver *UsersvcClient) UploadAvatar2(pc context.Context, pf []*multipart.FileHeader, ps string, pf2 *multipart.FileHeader, pf3 *multipart.FileHeader) (ri int, rs string, re error) {
+func (receiver *UsersvcClient) UploadAvatar2(pc context.Context, pf []*v3.FileModel, ps string, pf2 *v3.FileModel, pf3 *v3.FileModel) (ri int, rs string, re error) {
 	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
 	_req.SetContext(pc)
-	for _, _fh := range pf {
-		_f, _err := _fh.Open()
-		if _err != nil {
-			re = errors.Wrap(_err, "")
-			return
-		}
-		_req.SetFileReader("pf", _fh.Filename, _f)
+	for _, _f := range pf {
+		_req.SetFileReader("pf", _f.Filename, _f.Reader)
 	}
 	_urlValues.Set("ps", fmt.Sprintf("%v", ps))
-	if _f, _err := pf2.Open(); _err != nil {
-		re = errors.Wrap(_err, "")
-		return
-	} else {
-		_req.SetFileReader("pf2", pf2.Filename, _f)
-	}
-	if _f, _err := pf3.Open(); _err != nil {
-		re = errors.Wrap(_err, "")
-		return
-	} else {
-		_req.SetFileReader("pf3", pf3.Filename, _f)
-	}
+	_req.SetFileReader("pf2", pf2.Filename, pf2.Reader)
+	_req.SetFileReader("pf3", pf3.Filename, pf3.Reader)
 	_path := "/upload/avatar/2"
 	if _req.Body != nil {
 		_req.SetQueryParamsFromValues(_urlValues)

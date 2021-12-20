@@ -217,6 +217,15 @@ You can see ordersvc send a request to usersvc to get data and then send respons
 Let's see what apis that usersvc service is providing for us.
 
 ```go
+package service
+
+import (
+	"context"
+	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"
+	"os"
+	"usersvc/vo"
+)
+
 // Usersvc User Center Service
 type Usersvc interface {
 	// PageUsers demonstrate how to define POST and Content-Type as application/json api
@@ -229,15 +238,25 @@ type Usersvc interface {
 	SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error)
 
 	// UploadAvatar demonstrate how to define upload files api
-	UploadAvatar(context.Context, []*multipart.FileHeader, string) (int, string, error)
+	// there must be one []*v3.FileModel or *v3.FileModel parameter among input parameters
+	// remember to close the readers by Close method of v3.FileModel if you don't need them anymore when you finished your own business logic
+	UploadAvatar(context.Context, []*v3.FileModel, string) (int, string, error)
 
-	// UploadAvatar demonstrate how to define upload files api
-	// there must be one []*multipart.FileHeader or *multipart.FileHeader parameter among output parameters
-	UploadAvatar2(context.Context, []*multipart.FileHeader, string, *multipart.FileHeader, *multipart.FileHeader) (int, string, error)
+	// UploadAvatar2 demonstrate how to define upload files api
+	// remember to close the readers by Close method of v3.FileModel if you don't need them anymore when you finished your own business logic
+	UploadAvatar2(context.Context, []*v3.FileModel, string, *v3.FileModel, *v3.FileModel) (int, string, error)
 
 	// GetDownloadAvatar demonstrate how to define download file api
 	// there must be *os.File parameter among output parameters
-	GetDownloadAvatar(ctx context.Context, userId string) (string, *os.File, error)
+	GetDownloadAvatar(ctx context.Context, userId string) (
+	// mimetype(Content-Type) for download file
+	// you don't have to add this parameter because you will have a default value application/octet-stream
+	// in generated handlerimpl.go file.
+	// if you add it, you should make a small fix manually to replace application/octet-stream with it.
+	// Any custom manual fix in handlerimpl.go file won't been overwritten when you re-execute go-doudou commands
+	// like go-doudou svc http --handler -c go --doc
+		string,
+		*os.File, error)
 }
 ```
 

@@ -31,6 +31,7 @@ type PageQuery struct {
 	Page   Page
 }
 
+// PageRet pagination query result
 type PageRet struct {
 	Items    interface{}
 	PageNo   int
