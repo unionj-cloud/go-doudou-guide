@@ -12,8 +12,10 @@ require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/mattn/go-runewidth v0.0.13 // indirect
+	github.com/opentracing-contrib/go-stdlib v1.0.0
+	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/unionj-cloud/cast v1.3.2
-	github.com/unionj-cloud/go-doudou v0.8.4
+	github.com/unionj-cloud/go-doudou v0.8.5
 )

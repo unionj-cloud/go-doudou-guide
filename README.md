@@ -9,7 +9,7 @@ This is a demo project for showing how go-doudou can help you.
 Install go-doudou
 
 ```shell
-go get -v github.com/unionj-cloud/go-doudou@v0.8.4
+go get -v github.com/unionj-cloud/go-doudou@v0.8.5
 ```
 
 
@@ -281,6 +281,14 @@ Also you can have a look the document from browser.
 ![screenshot2](./screenshot2.png)
 
 ![screenshot3](./screenshot3.png)
+
+
+
+### Docker Compose
+You can execute below command to start the whole services and jaeger
+```shell
+docker-compose -f docker-compose.yml up -d 
+```
 
 
 

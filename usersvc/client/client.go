@@ -4,7 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/opentracing-contrib/go-stdlib/nethttp"
+	"github.com/opentracing/opentracing-go"
 	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -279,8 +282,20 @@ func NewUsersvc(opts ...ddhttp.DdClientOption) *UsersvcClient {
 		opt(svcClient)
 	}
 
-	svcClient.client.OnBeforeRequest(func(client *resty.Client, request *resty.Request) error {
-		client.SetHostURL(svcClient.provider.SelectServer())
+	svcClient.client.OnBeforeRequest(func(_ *resty.Client, request *resty.Request) error {
+		request.URL = svcClient.provider.SelectServer() + request.URL
+		return nil
+	})
+
+	svcClient.client.SetPreRequestHook(func(_ *resty.Client, request *http.Request) error {
+		traceReq, _ := nethttp.TraceRequest(opentracing.GlobalTracer(), request,
+			nethttp.OperationName(fmt.Sprintf("HTTP %s: %s", request.Method, request.RequestURI)))
+		*request = *traceReq
+		return nil
+	})
+
+	svcClient.client.OnAfterResponse(func(_ *resty.Client, response *resty.Response) error {
+		nethttp.TracerFromRequest(response.Request.RawRequest).Finish()
 		return nil
 	})
 
