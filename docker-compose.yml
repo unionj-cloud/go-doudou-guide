@@ -2,6 +2,8 @@ version: '3.9'
 
 services:
   seed:
+    container_name: seed
+    hostname: seed
     build:
       context: ./seed
       args:
@@ -11,6 +13,8 @@ services:
         ipv4_address: 172.28.1.1
 
   ordersvc:
+    container_name: ordersvc
+    hostname: ordersvc
     build:
       context: ./ordersvc
       args:
@@ -33,6 +37,8 @@ services:
       - jaeger
 
   usersvc:
+    container_name: usersvc
+    hostname: usersvc
     build:
       context: ./usersvc
       args:
@@ -56,6 +62,8 @@ services:
       - jaeger
 
   usersvc01:
+    container_name: usersvc01
+    hostname: usersvc01
     build:
       context: ./usersvc
       args:
@@ -79,6 +87,8 @@ services:
       - jaeger
 
   usersvc02:
+    container_name: usersvc02
+    hostname: usersvc02
     build:
       context: ./usersvc
       args:
@@ -102,6 +112,8 @@ services:
       - jaeger
 
   jaeger:
+    container_name: jaeger
+    hostname: jaeger
     image: jaegertracing/all-in-one:latest
     ports:
       - "6831:6831/udp"
