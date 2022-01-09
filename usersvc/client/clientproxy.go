@@ -83,7 +83,7 @@ func NewClientProxy(client service.Usersvc, opts ...ProxyOption) *ClientProxy {
 	runner := goresilience.RunnerChain(
 		circuitbreaker.NewMiddleware(circuitbreaker.Config{
 			ErrorPercentThresholdToOpen:        50,
-			MinimumRequestToOpen:               20,
+			MinimumRequestToOpen:               6,
 			SuccessfulRequiredOnHalfOpen:       1,
 			WaitDurationInOpenState:            5 * time.Second,
 			MetricsSlidingWindowBucketQuantity: 10,

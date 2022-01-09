@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -94,6 +95,10 @@ func (receiver *UsersvcImpl) UploadAvatar(ctx context.Context, avatar []*v3.File
 func (receiver *UsersvcImpl) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
 	select {
 	case <-time.After(10 * time.Millisecond):
+		minute := time.Now().Second()
+		if minute%2 != 0 {
+			panic(fmt.Errorf("error because %d minute is odd", minute))
+		}
 		return 0, vo.PageRet{
 			Items: []map[string]interface{}{
 				{
