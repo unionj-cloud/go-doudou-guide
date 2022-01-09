@@ -16,6 +16,10 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
+	github.com/slok/goresilience v0.2.0
 	github.com/unionj-cloud/cast v1.3.2
-	github.com/unionj-cloud/go-doudou v0.8.7
+	github.com/unionj-cloud/go-doudou v0.9.0
+	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
 )
+
+//replace github.com/unionj-cloud/go-doudou v0.9.0 => /Users/wubin1989/workspace/cloud/go-doudou

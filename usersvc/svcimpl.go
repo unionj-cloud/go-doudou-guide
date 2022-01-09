@@ -93,7 +93,7 @@ func (receiver *UsersvcImpl) UploadAvatar(ctx context.Context, avatar []*v3.File
 
 func (receiver *UsersvcImpl) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
 	select {
-	case <-time.After(100 * time.Millisecond):
+	case <-time.After(10 * time.Millisecond):
 		return 0, vo.PageRet{
 			Items: []map[string]interface{}{
 				{
