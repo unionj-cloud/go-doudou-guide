@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	ddconfig "github.com/unionj-cloud/go-doudou/svc/config"
 	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
+
 	"github.com/unionj-cloud/go-doudou/svc/logger"
 	"github.com/unionj-cloud/go-doudou/svc/registry"
 	"github.com/unionj-cloud/go-doudou/svc/tracing"

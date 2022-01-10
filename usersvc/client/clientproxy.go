@@ -3,13 +3,16 @@ package client
 import (
 	"context"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"github.com/slok/goresilience"
 	"github.com/slok/goresilience/circuitbreaker"
 	rerrors "github.com/slok/goresilience/errors"
+	"github.com/slok/goresilience/metrics"
 	"github.com/slok/goresilience/retry"
 	"github.com/slok/goresilience/timeout"
 	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"
+	"github.com/unionj-cloud/go-doudou/svc/config"
 	"os"
 	"time"
 	service "usersvc"
@@ -80,8 +83,23 @@ func WithLogger(logger *logrus.Logger) ProxyOption {
 }
 
 func NewClientProxy(client service.Usersvc, opts ...ProxyOption) *ClientProxy {
-	runner := goresilience.RunnerChain(
-		circuitbreaker.NewMiddleware(circuitbreaker.Config{
+	cp := &ClientProxy{
+		client: client,
+		logger: logrus.StandardLogger(),
+	}
+
+	for _, opt := range opts {
+		opt(cp)
+	}
+
+	if cp.runner == nil {
+		var mid []goresilience.Middleware
+
+		if config.GddManage.Load() == "true" {
+			mid = append(mid, metrics.NewMiddleware("usersvc_client", metrics.NewPrometheusRecorder(prometheus.DefaultRegisterer)))
+		}
+
+		mid = append(mid, circuitbreaker.NewMiddleware(circuitbreaker.Config{
 			ErrorPercentThresholdToOpen:        50,
 			MinimumRequestToOpen:               6,
 			SuccessfulRequiredOnHalfOpen:       1,
@@ -89,22 +107,14 @@ func NewClientProxy(client service.Usersvc, opts ...ProxyOption) *ClientProxy {
 			MetricsSlidingWindowBucketQuantity: 10,
 			MetricsBucketDuration:              1 * time.Second,
 		}),
-		timeout.NewMiddleware(timeout.Config{
-			Timeout: 3 * time.Minute,
-		}),
-		retry.NewMiddleware(retry.Config{
-			Times: 3,
-		}),
-	)
+			timeout.NewMiddleware(timeout.Config{
+				Timeout: 3 * time.Minute,
+			}),
+			retry.NewMiddleware(retry.Config{
+				Times: 3,
+			}))
 
-	cp := &ClientProxy{
-		client: client,
-		logger: logrus.StandardLogger(),
-		runner: runner,
-	}
-
-	for _, opt := range opts {
-		opt(cp)
+		cp.runner = goresilience.RunnerChain(mid...)
 	}
 
 	return cp
