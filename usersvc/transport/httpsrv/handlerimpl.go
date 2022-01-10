@@ -278,7 +278,6 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _
 	if len(pf3FileHeaders) > 0 {
 		_fh := pf3FileHeaders[0]
 		_f, err := _fh.Open()
-		_f.Close()
 		if err != nil {
 			http.Error(_writer, err.Error(), http.StatusBadRequest)
 			return
@@ -314,6 +313,13 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _
 		return
 	}
 }
+
+func NewUsersvcHandler(usersvc service.Usersvc) UsersvcHandler {
+	return &UsersvcHandlerImpl{
+		usersvc,
+	}
+}
+
 func (receiver *UsersvcHandlerImpl) GetDownloadAvatar(_writer http.ResponseWriter, _req *http.Request) {
 	var (
 		ctx    context.Context
@@ -354,13 +360,7 @@ func (receiver *UsersvcHandlerImpl) GetDownloadAvatar(_writer http.ResponseWrite
 		return
 	}
 	_writer.Header().Set("Content-Disposition", "attachment; filename="+_fi.Name())
-	_writer.Header().Set("Content-Type", rs)
+	_writer.Header().Set("Content-Type", "application/octet-stream")
 	_writer.Header().Set("Content-Length", fmt.Sprintf("%d", _fi.Size()))
 	io.Copy(_writer, rf)
-}
-
-func NewUsersvcHandler(usersvc service.Usersvc) UsersvcHandler {
-	return &UsersvcHandlerImpl{
-		usersvc,
-	}
 }

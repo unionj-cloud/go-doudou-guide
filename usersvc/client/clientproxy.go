@@ -2,6 +2,11 @@ package client
 
 import (
 	"context"
+	"os"
+	"time"
+	service "usersvc"
+	"usersvc/vo"
+
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
@@ -13,77 +18,134 @@ import (
 	"github.com/slok/goresilience/timeout"
 	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"
 	"github.com/unionj-cloud/go-doudou/svc/config"
-	"os"
-	"time"
-	service "usersvc"
-	"usersvc/vo"
 )
 
-type ClientProxy struct {
+type UsersvcClientProxy struct {
 	client service.Usersvc
 	logger *logrus.Logger
 	runner goresilience.Runner
 }
 
-func (c ClientProxy) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
-	err := c.runner.Run(ctx, func(ctx context.Context) error {
-		code, data, msg = c.client.PageUsers(ctx, query)
+func (receiver *UsersvcClientProxy) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		code, data, msg = receiver.client.PageUsers(
+			ctx,
+			query,
+		)
 		if msg != nil {
-			return errors.Wrap(msg, "")
+			return errors.Wrap(msg, "call PageUsers fail")
 		}
 		return nil
-	})
-	if err != nil {
-		if errors.Is(err, rerrors.ErrCircuitOpen) {
-			// you can implement your fallback logic here
-			c.logger.Error(err)
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
 		}
-		msg = errors.Wrap(err, "")
+		msg = errors.Wrap(_err, "call PageUsers fail")
+	}
+	return
+}
+func (receiver *UsersvcClientProxy) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		code, data, msg = receiver.client.GetUser(
+			ctx,
+			userId,
+			photo,
+		)
+		if msg != nil {
+			return errors.Wrap(msg, "call GetUser fail")
+		}
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+		msg = errors.Wrap(_err, "call GetUser fail")
+	}
+	return
+}
+func (receiver *UsersvcClientProxy) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		code, data, msg = receiver.client.SignUp(
+			ctx,
+			username,
+			password,
+			actived,
+			score,
+		)
+		if msg != nil {
+			return errors.Wrap(msg, "call SignUp fail")
+		}
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+		msg = errors.Wrap(_err, "call SignUp fail")
+	}
+	return
+}
+func (receiver *UsersvcClientProxy) UploadAvatar(pc context.Context, pf []*v3.FileModel, ps string) (ri int, rs string, re error) {
+	if _err := receiver.runner.Run(pc, func(ctx context.Context) error {
+		ri, rs, re = receiver.client.UploadAvatar(
+			pc,
+			pf,
+			ps,
+		)
+		if re != nil {
+			return errors.Wrap(re, "call UploadAvatar fail")
+		}
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+		re = errors.Wrap(_err, "call UploadAvatar fail")
+	}
+	return
+}
+func (receiver *UsersvcClientProxy) UploadAvatar2(pc context.Context, pf []*v3.FileModel, ps string, pf2 *v3.FileModel, pf3 *v3.FileModel) (ri int, rs string, re error) {
+	if _err := receiver.runner.Run(pc, func(ctx context.Context) error {
+		ri, rs, re = receiver.client.UploadAvatar2(
+			pc,
+			pf,
+			ps,
+			pf2,
+			pf3,
+		)
+		if re != nil {
+			return errors.Wrap(re, "call UploadAvatar2 fail")
+		}
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+		re = errors.Wrap(_err, "call UploadAvatar2 fail")
 	}
 	return
 }
 
-func (c ClientProxy) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c ClientProxy) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c ClientProxy) UploadAvatar(ctx context.Context, models []*v3.FileModel, s string) (int, string, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c ClientProxy) UploadAvatar2(ctx context.Context, models []*v3.FileModel, s string, model *v3.FileModel, model2 *v3.FileModel) (int, string, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c ClientProxy) GetDownloadAvatar(ctx context.Context, userId string) (string, *os.File, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-type ProxyOption func(*ClientProxy)
+type ProxyOption func(*UsersvcClientProxy)
 
 func WithRunner(runner goresilience.Runner) ProxyOption {
-	return func(proxy *ClientProxy) {
+	return func(proxy *UsersvcClientProxy) {
 		proxy.runner = runner
 	}
 }
 
 func WithLogger(logger *logrus.Logger) ProxyOption {
-	return func(proxy *ClientProxy) {
+	return func(proxy *UsersvcClientProxy) {
 		proxy.logger = logger
 	}
 }
 
-func NewClientProxy(client service.Usersvc, opts ...ProxyOption) *ClientProxy {
-	cp := &ClientProxy{
+func NewUsersvcClientProxy(client service.Usersvc, opts ...ProxyOption) *UsersvcClientProxy {
+	cp := &UsersvcClientProxy{
 		client: client,
 		logger: logrus.StandardLogger(),
 	}
@@ -118,4 +180,24 @@ func NewClientProxy(client service.Usersvc, opts ...ProxyOption) *ClientProxy {
 	}
 
 	return cp
+}
+
+func (receiver *UsersvcClientProxy) GetDownloadAvatar(ctx context.Context, userId string) (rs string, rf *os.File, re error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		rs, rf, re = receiver.client.GetDownloadAvatar(
+			ctx,
+			userId,
+		)
+		if re != nil {
+			return errors.Wrap(re, "call GetDownloadAvatar fail")
+		}
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+		re = errors.Wrap(_err, "call GetDownloadAvatar fail")
+	}
+	return
 }

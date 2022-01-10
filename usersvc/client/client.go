@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/opentracing-contrib/go-stdlib/nethttp"
-	"github.com/opentracing/opentracing-go"
 	"io"
 	"net/http"
 	"net/url"
@@ -15,6 +13,8 @@ import (
 	"usersvc/vo"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/opentracing-contrib/go-stdlib/nethttp"
+	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/unionj-cloud/go-doudou/fileutils"
 	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"

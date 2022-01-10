@@ -36,7 +36,7 @@ func main() {
 
 	usersvcProvider := ddhttp.NewSmoothWeightedRoundRobinProvider("usersvc")
 	usersvcClient := client.NewUsersvc(ddhttp.WithProvider(usersvcProvider))
-	usersvcClientProxy := client.NewClientProxy(usersvcClient)
+	usersvcClientProxy := client.NewUsersvcClientProxy(usersvcClient)
 
 	svc := service.NewOrdersvc(conf, nil, usersvcClientProxy)
 
