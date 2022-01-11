@@ -324,7 +324,6 @@ func (receiver *UsersvcHandlerImpl) GetDownloadAvatar(_writer http.ResponseWrite
 	var (
 		ctx    context.Context
 		userId string
-		rs     string
 		rf     *os.File
 		re     error
 	)
@@ -336,7 +335,7 @@ func (receiver *UsersvcHandlerImpl) GetDownloadAvatar(_writer http.ResponseWrite
 	if _, exists := _req.Form["userId"]; exists {
 		userId = _req.FormValue("userId")
 	}
-	rs, rf, re = receiver.usersvc.GetDownloadAvatar(
+	_, rf, re = receiver.usersvc.GetDownloadAvatar(
 		ctx,
 		userId,
 	)

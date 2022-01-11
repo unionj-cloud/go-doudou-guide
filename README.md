@@ -9,7 +9,7 @@ This is a demo project for showing how go-doudou can help you.
 Install go-doudou
 
 ```shell
-go get -v github.com/unionj-cloud/go-doudou@v0.9.0
+go get -v github.com/unionj-cloud/go-doudou@v0.9.1
 ```
 
 
@@ -285,12 +285,93 @@ Also you can have a look the document from browser.
 
 
 ### Docker Compose
-You can execute below command to start the whole services and jaeger
+#### Start
+Before start all services by docker-compose, you should build images for each
+```shell
+➜  go-doudou-guide git:(master) ✗ cd ordersvc                                                                                                                                  
+➜  ordersvc git:(master) ✗ go mod vendor && docker build -t ordersvc .
+```
+```shell
+➜  go-doudou-guide git:(master) ✗ cd seed                                                                                                                                  
+➜  seed git:(master) ✗ go mod vendor && docker build -t seed .
+```
+```shell
+➜  go-doudou-guide git:(master) ✗ cd usersvc                                                                                                                                  
+➜  usersvc git:(master) ✗ go mod vendor && docker build -t usersvc .
+```
+Then You can execute below command to start the whole services from project root.
 ```shell
 docker-compose -f docker-compose.yml up -d 
 ```
 
+#### Test
+I use [ddosify](https://github.com/ddosify/ddosify) for load testing. To install it:
+```shell
+go install -v go.ddosify.com/ddosify@latest
+```
+Then 
+```shell
+➜  go-doudou-guide git:(master) ✗ ddosify -t http://localhost:6062/page/users -n 1000 -d 20  -m POST -T 2 -l incremental -h 'Content-Type: application/json' -b '{             
+    "Filter": {                                                                   
+        "Dept": 9261131,
+        "Name": "dolore sint qui reprehenderit"
+    },
+    "Page": {
+        "Orders": [
+            {
+                "Col": "tempor culpa Excepteur",
+                "Sort": "E"
+            },
+            {
+                "Col": "temp",
+                "Sort": "proident do nostrud"
+            }
+        ],
+        "PageNo": 71167290,
+        "Size": 48190708
+    }
+}'
+⚙️  Initializing... 
+🔥 Engine fired. 
 
+🛑 CTRL+C to gracefully stop.
+✔️  Successful Run: 20     100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.08863s
+✔️  Successful Run: 46     100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.04146s
+✔️  Successful Run: 84     100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.02520s
+✔️  Successful Run: 121    100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.02097s
+✔️  Successful Run: 184    100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.02997s
+✔️  Successful Run: 248    100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.02420s
+✔️  Successful Run: 322    100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.02046s
+✔️  Successful Run: 403    100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.02429s
+✔️  Successful Run: 496    100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.02128s
+✔️  Successful Run: 594    100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.01897s
+✔️  Successful Run: 690    100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.01810s
+✔️  Successful Run: 820    100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.02212s
+✔️  Successful Run: 948    100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.02045s
+✔️  Successful Run: 1000   100%       ❌ Failed Run: 0        0%       ⏱️  Avg. Duration: 0.01991s
+
+
+RESULT
+-------------------------------------
+Success Count:    1000  (100%)
+Failed Count:     0     (0%)
+
+Durations (Avg):
+  DNS                  :0.0006s
+  Connection           :0.0004s
+  Request Write        :0.0001s
+  Server Processing    :0.0188s
+  Response Read        :0.0000s
+  Total                :0.0199s
+
+Status Code (Message) :Count
+  200 (OK)                       :24
+  500 (Internal Server Error)    :976
+```
+
+#### Grafana / Prometheus
+You can open http://localhost:3000/ to see `go-doudou-guide` dashboard.
+![grafana](./grafana.png)
 
 ### TODO
 

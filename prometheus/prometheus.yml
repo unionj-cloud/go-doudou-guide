@@ -1,25 +1,16 @@
 global:
-  scrape_interval:     15s
+  scrape_interval: 15s
   evaluation_interval: 15s
 
 rule_files:
   - 'alert.rules'
 
 scrape_configs:
-  - job_name: prometheus
-    static_configs:
-      - targets: ['localhost:9090']
-  - job_name: ordersvc
+  - job_name: "go-doudou-guide"
     basic_auth:
       username: admin
       password: admin
     metrics_path: /go-doudou/prometheus
-    static_configs:
-      - targets: ['ordersvc:6062']
-  - job_name: usersvc
-    basic_auth:
-      username: admin
-      password: admin
-    metrics_path: /go-doudou/prometheus
-    static_configs:
-      - targets: [ 'usersvc:6061' ]
+    file_sd_configs:
+      - files:
+          - sd/godoudouguide_sd.json

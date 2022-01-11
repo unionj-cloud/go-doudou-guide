@@ -4,10 +4,9 @@ services:
   seed:
     container_name: seed
     hostname: seed
-    build:
-      context: ./seed
-      args:
-        buildno: 1
+    image: seed:latest
+    volumes:
+      - ./prometheus/sd/:/repo/out/
     networks:
       testing_net:
         ipv4_address: 172.28.1.1
@@ -15,10 +14,7 @@ services:
   ordersvc:
     container_name: ordersvc
     hostname: ordersvc
-    build:
-      context: ./ordersvc
-      args:
-        buildno: 1
+    image: ordersvc:latest
     environment:
       - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
       - GDD_MEM_SEED=seed:56199
@@ -39,10 +35,7 @@ services:
   usersvc:
     container_name: usersvc
     hostname: usersvc
-    build:
-      context: ./usersvc
-      args:
-        buildno: 1
+    image: usersvc:latest
     environment:
       - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
       - GDD_MEM_SEED=seed:56199
@@ -64,10 +57,7 @@ services:
   usersvc01:
     container_name: usersvc01
     hostname: usersvc01
-    build:
-      context: ./usersvc
-      args:
-        buildno: 1
+    image: usersvc:latest
     environment:
       - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
       - GDD_MEM_SEED=seed:56199
@@ -89,10 +79,7 @@ services:
   usersvc02:
     container_name: usersvc02
     hostname: usersvc02
-    build:
-      context: ./usersvc
-      args:
-        buildno: 1
+    image: usersvc:latest
     environment:
       - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
       - GDD_MEM_SEED=seed:56199
@@ -127,7 +114,6 @@ services:
     container_name: prometheus
     volumes:
       - ./prometheus/:/etc/prometheus/
-      - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -136,12 +122,14 @@ services:
     ports:
       - 9090:9090
     restart: always
+    networks:
+      testing_net:
+        ipv4_address: 172.28.1.7
 
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
     volumes:
-      - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
     environment:
       - GF_AUTH_DISABLE_LOGIN_FORM=false
@@ -149,6 +137,9 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     ports:
       - 3000:3000
+    networks:
+      testing_net:
+        ipv4_address: 172.28.1.8
 
 networks:
   testing_net:
@@ -156,7 +147,3 @@ networks:
       driver: default
       config:
         - subnet: 172.28.0.0/16
-
-volumes:
-  grafana_data:
-  prometheus_data:
