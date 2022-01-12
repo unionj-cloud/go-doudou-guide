@@ -13,4 +13,4 @@ require (
 	github.com/unionj-cloud/memberlist v0.2.13
 )
 
-//replace github.com/unionj-cloud/go-doudou v0.9.1 => /Users/wubin1989/workspace/cloud/go-doudou
+replace github.com/unionj-cloud/go-doudou v0.9.1 => /Users/wubin1989/workspace/cloud/go-doudou

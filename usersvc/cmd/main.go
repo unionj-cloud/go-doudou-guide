@@ -23,6 +23,8 @@ func main() {
 	conf := config.LoadFromEnv()
 
 	logger.Init()
+	logFile := logger.PersistLogToDisk()
+	defer logFile.Close()
 
 	if ddconfig.GddMode.Load() == "micro" {
 		err := registry.NewNode()

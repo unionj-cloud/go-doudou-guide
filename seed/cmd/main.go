@@ -21,6 +21,9 @@ import (
 func main() {
 	ddconfig.InitEnv()
 	logger.Init()
+	logFile := logger.PersistLogToDisk()
+	defer logFile.Close()
+
 	err := registry.NewNode()
 	if err != nil {
 		logrus.Panicln(fmt.Sprintf("%+v", err))
