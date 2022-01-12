@@ -14,6 +14,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/unionj-cloud/go-doudou v0.9.1
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	usersvc v0.0.0
 )
 
