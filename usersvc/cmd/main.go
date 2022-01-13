@@ -26,13 +26,17 @@ func main() {
 	ddconfig.InitEnv()
 	conf := config.LoadFromEnv()
 
-	logger.Init(logger.WithWritter(io.MultiWriter(os.Stdout, &lumberjack.Logger{
-		Filename:   filepath.Join(os.Getenv("LOG_PATH"), fmt.Sprintf("%s.log", ddconfig.GddServiceName.Load())),
-		MaxSize:    5,  // Max megabytes before log is rotated
-		MaxBackups: 10, // Max number of old log files to keep
-		MaxAge:     7,  // Max number of days to retain log files
-		Compress:   true,
-	})))
+	if logger.CheckDev() {
+		logger.Init(logger.WithWritter(os.Stdout))
+	} else {
+		logger.Init(logger.WithWritter(io.MultiWriter(os.Stdout, &lumberjack.Logger{
+			Filename:   filepath.Join(os.Getenv("LOG_PATH"), fmt.Sprintf("%s.log", ddconfig.GddServiceName.Load())),
+			MaxSize:    5,  // Max megabytes before log is rotated
+			MaxBackups: 10, // Max number of old log files to keep
+			MaxAge:     7,  // Max number of days to retain log files
+			Compress:   true,
+		})))
+	}
 
 	if ddconfig.GddMode.Load() == "micro" {
 		err := registry.NewNode()
@@ -57,7 +61,9 @@ func main() {
 		}))
 	}))
 
-	srv.AddMiddleware(ddhttp.Tracing, ddhttp.Metrics, ddhttp.BulkHead(1, 10*time.Millisecond), requestid.RequestIDHandler, handlers.CompressHandler, handlers.ProxyHeaders, httpsrv.RateLimit(store), ddhttp.Logger, ddhttp.Rest, ddhttp.Recover)
+	srv.AddMiddleware(ddhttp.Tracing, ddhttp.Metrics, ddhttp.BulkHead(1, 10*time.Millisecond), requestid.RequestIDHandler, handlers.CompressHandler, handlers.ProxyHeaders, httpsrv.RateLimit(store),
+		ddhttp.Logger,
+		ddhttp.Rest, ddhttp.Recover)
 	srv.AddRoute(httpsrv.Routes(handler)...)
 	srv.Run()
 }

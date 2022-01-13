@@ -6,7 +6,9 @@ services:
     hostname: seed
     image: seed:latest
     environment:
-      - GDD_LOG_PATH=/var/log
+      - LOG_PATH=/var/log
+      - GDD_LOG_LEVEL=debug
+      - GDD_ENV=test
     volumes:
       - ./prometheus/sd/:/repo/out/
       - ./log:/var/log
@@ -23,7 +25,9 @@ services:
       - GDD_MEM_SEED=seed:56199
       - JAEGER_AGENT_HOST=jaeger
       - JAEGER_AGENT_PORT=6831
-      - GDD_LOG_PATH=/var/log
+      - LOG_PATH=/var/log
+      - GDD_LOG_LEVEL=debug
+      - GDD_ENV=test
     volumes:
       - ./log:/var/log
     expose:
@@ -49,7 +53,10 @@ services:
       - GDD_MEM_NAME=
       - JAEGER_AGENT_HOST=jaeger
       - JAEGER_AGENT_PORT=6831
-      - GDD_LOG_PATH=/var/log
+      - LOG_PATH=/var/log
+      - GDD_MODE=micro
+      - GDD_LOG_LEVEL=debug
+      - GDD_ENV=test
     volumes:
       - ./log:/var/log
     expose:
@@ -74,7 +81,10 @@ services:
       - GDD_MEM_NAME=
       - JAEGER_AGENT_HOST=jaeger
       - JAEGER_AGENT_PORT=6831
-      - GDD_LOG_PATH=/var/log
+      - LOG_PATH=/var/log
+      - GDD_MODE=micro
+      - GDD_LOG_LEVEL=debug
+      - GDD_ENV=test
     volumes:
       - ./log:/var/log
     expose:
@@ -99,7 +109,10 @@ services:
       - GDD_MEM_NAME=
       - JAEGER_AGENT_HOST=jaeger
       - JAEGER_AGENT_PORT=6831
-      - GDD_LOG_PATH=/var/log
+      - LOG_PATH=/var/log
+      - GDD_MODE=micro
+      - GDD_LOG_LEVEL=debug
+      - GDD_ENV=test
     volumes:
       - ./log:/var/log
     expose:
