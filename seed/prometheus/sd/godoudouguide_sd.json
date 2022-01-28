@@ -1,0 +1,72 @@
+[
+    {
+        "targets": [
+            "172.28.1.1:56200"
+        ],
+        "labels": {
+            "base_url": "http://172.28.1.1:56200",
+            "build_time": "2022-01-13 12:52:33",
+            "build_user": "",
+            "go_ver": "go1.16.12",
+            "godoudou_ver": "v0.9.1",
+            "hostname": "seed",
+            "service_id": "seed"
+        }
+    },
+    {
+        "targets": [
+            "172.28.1.4:6061"
+        ],
+        "labels": {
+            "base_url": "http://172.28.1.4:6061",
+            "build_time": "2022-01-13 13:00:49",
+            "build_user": "",
+            "go_ver": "go1.13.4",
+            "godoudou_ver": "v0.9.1",
+            "hostname": "usersvc01",
+            "service_id": "usersvc"
+        }
+    },
+    {
+        "targets": [
+            "172.28.1.3:6061"
+        ],
+        "labels": {
+            "base_url": "http://172.28.1.3:6061",
+            "build_time": "2022-01-13 13:00:49",
+            "build_user": "",
+            "go_ver": "go1.13.4",
+            "godoudou_ver": "v0.9.1",
+            "hostname": "usersvc",
+            "service_id": "usersvc"
+        }
+    },
+    {
+        "targets": [
+            "172.28.1.2:6062"
+        ],
+        "labels": {
+            "base_url": "http://172.28.1.2:6062",
+            "build_time": "2022-01-13 12:58:59",
+            "build_user": "",
+            "go_ver": "go1.13.4",
+            "godoudou_ver": "v0.9.1",
+            "hostname": "ordersvc",
+            "service_id": "ordersvc"
+        }
+    },
+    {
+        "targets": [
+            "172.28.1.5:6061"
+        ],
+        "labels": {
+            "base_url": "http://172.28.1.5:6061",
+            "build_time": "2022-01-13 13:00:49",
+            "build_user": "",
+            "go_ver": "go1.13.4",
+            "godoudou_ver": "v0.9.1",
+            "hostname": "usersvc02",
+            "service_id": "usersvc"
+        }
+    }
+]
