@@ -9,9 +9,10 @@ import (
 	"usersvc/config"
 	"usersvc/vo"
 
+	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
+
 	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	ddconfig "github.com/unionj-cloud/go-doudou/svc/config"
@@ -21,38 +22,8 @@ type UsersvcImpl struct {
 	conf *config.Config
 }
 
-func saveFile(fm *v3.FileModel) error {
-	defer fm.Close()
-	f, err := os.OpenFile(ddconfig.GddOutput.Load()+"/"+fm.Filename, os.O_WRONLY|os.O_CREATE, os.ModePerm)
-	if err != nil {
-		return errors.Wrapf(err, "call os.OpenFile error")
-	}
-	defer f.Close()
-	_, err = io.Copy(f, fm.Reader)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (receiver *UsersvcImpl) UploadAvatar2(ctx context.Context, headers []*v3.FileModel, s string, header *v3.FileModel, header2 *v3.FileModel) (int, string, error) {
-	_ = os.MkdirAll(ddconfig.GddOutput.Load(), os.ModePerm)
-	for _, fh := range headers {
-		if err := saveFile(fh); err != nil {
-			return 1, "", errors.Wrapf(err, "call saveFile error")
-		}
-	}
-	if header != nil {
-		if err := saveFile(header); err != nil {
-			return 1, "", errors.Wrapf(err, "call saveFile error")
-		}
-	}
-	if header2 != nil {
-		if err := saveFile(header2); err != nil {
-			return 1, "", errors.Wrapf(err, "call saveFile error")
-		}
-	}
-	return 0, "OK", nil
+func (receiver *UsersvcImpl) GetUser4(ctx context.Context, userId string, photo *string, pattrs *[]int, attrs2 ...int) (code int, data *string, msg error) {
+	return 0, nil, ddhttp.NewBizError(errors.New("test error"), ddhttp.WithStatusCode(555), ddhttp.WithErrCode(10001))
 }
 
 func (receiver *UsersvcImpl) GetDownloadAvatar(ctx context.Context, userId string) (string, *os.File, error) {
@@ -79,17 +50,86 @@ func (receiver *UsersvcImpl) GetDownloadAvatar(ctx context.Context, userId strin
 	return mimetype, f, err
 }
 
-func (receiver *UsersvcImpl) UploadAvatar(ctx context.Context, avatar []*v3.FileModel, userId string) (code int, data string, msg error) {
-	if len(avatar) == 0 {
-		return 1, "", errors.New("no file upload")
-	}
-	_ = os.MkdirAll(ddconfig.GddOutput.Load(), os.ModePerm)
-	err := saveFile(avatar[0])
-	if err != nil {
-		return 1, "", errors.Wrap(err, "save file failed")
-	}
-	return 0, "OK", nil
+func (receiver *UsersvcImpl) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
+	//TODO implement me
+	panic("implement me")
 }
+
+func (receiver *UsersvcImpl) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (receiver *UsersvcImpl) UploadAvatar(ctx context.Context, models []v3.FileModel, s string) (int, string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (receiver *UsersvcImpl) UploadAvatar2(ctx context.Context, models []v3.FileModel, s string, model *v3.FileModel, model2 *v3.FileModel) (int, string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (receiver *UsersvcImpl) GetUser2(ctx context.Context, userId string, photo *string) (code int, data *string, msg error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (receiver *UsersvcImpl) PageUsers2(ctx context.Context, query *vo.PageQuery) (code int, data vo.PageRet, msg error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (receiver *UsersvcImpl) GetUser3(ctx context.Context, userId string, photo *string, attrs []int, pattrs *[]int) (code int, data *string, msg error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func saveFile(fm *v3.FileModel) error {
+	defer fm.Close()
+	f, err := os.OpenFile(ddconfig.GddOutput.Load()+"/"+fm.Filename, os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		return errors.Wrapf(err, "call os.OpenFile error")
+	}
+	defer f.Close()
+	_, err = io.Copy(f, fm.Reader)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//func (receiver *UsersvcImpl) UploadAvatar2(ctx context.Context, headers []*v3.FileModel, s string, header *v3.FileModel, header2 *v3.FileModel) (int, string, error) {
+//	_ = os.MkdirAll(ddconfig.GddOutput.Load(), os.ModePerm)
+//	for _, fh := range headers {
+//		if err := saveFile(fh); err != nil {
+//			return 1, "", errors.Wrapf(err, "call saveFile error")
+//		}
+//	}
+//	if header != nil {
+//		if err := saveFile(header); err != nil {
+//			return 1, "", errors.Wrapf(err, "call saveFile error")
+//		}
+//	}
+//	if header2 != nil {
+//		if err := saveFile(header2); err != nil {
+//			return 1, "", errors.Wrapf(err, "call saveFile error")
+//		}
+//	}
+//	return 0, "OK", nil
+//}
+
+//func (receiver *UsersvcImpl) UploadAvatar(ctx context.Context, avatar []*v3.FileModel, userId string) (code int, data string, msg error) {
+//	if len(avatar) == 0 {
+//		return 1, "", errors.New("no file upload")
+//	}
+//	_ = os.MkdirAll(ddconfig.GddOutput.Load(), os.ModePerm)
+//	err := saveFile(avatar[0])
+//	if err != nil {
+//		return 1, "", errors.Wrap(err, "save file failed")
+//	}
+//	return 0, "OK", nil
+//}
 
 func (receiver *UsersvcImpl) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
 	select {
@@ -125,21 +165,4 @@ func NewUsersvc(conf *config.Config) Usersvc {
 	return &UsersvcImpl{
 		conf,
 	}
-}
-
-func (receiver *UsersvcImpl) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
-	var _result struct {
-		Code int
-		Data string
-	}
-	_ = gofakeit.Struct(&_result)
-	return _result.Code, _result.Data, nil
-}
-func (receiver *UsersvcImpl) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
-	var _result struct {
-		Code int
-		Data string
-	}
-	_ = gofakeit.Struct(&_result)
-	return _result.Code, _result.Data, nil
 }

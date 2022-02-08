@@ -48,7 +48,7 @@ func main() {
 	opentracing.SetGlobalTracer(tracer)
 
 	usersvcProvider := ddhttp.NewSmoothWeightedRoundRobinProvider("usersvc")
-	usersvcClient := client.NewUsersvc(ddhttp.WithProvider(usersvcProvider))
+	usersvcClient := client.NewUsersvcClient(ddhttp.WithProvider(usersvcProvider))
 	usersvcClientProxy := client.NewUsersvcClientProxy(usersvcClient)
 
 	svc := service.NewOrdersvc(conf, nil, usersvcClientProxy)

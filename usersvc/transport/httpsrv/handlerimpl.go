@@ -11,8 +11,9 @@ import (
 	"usersvc/vo"
 
 	"github.com/pkg/errors"
-	"github.com/unionj-cloud/cast"
+	"github.com/unionj-cloud/go-doudou/cast"
 	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"
+	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
 )
 
 type UsersvcHandlerImpl struct {
@@ -28,11 +29,15 @@ func (receiver *UsersvcHandlerImpl) PageUsers(_writer http.ResponseWriter, _req 
 		msg   error
 	)
 	ctx = _req.Context()
-	if err := json.NewDecoder(_req.Body).Decode(&query); err != nil {
-		http.Error(_writer, err.Error(), http.StatusBadRequest)
+	if _req.Body == nil {
+		http.Error(_writer, "missing request body", http.StatusBadRequest)
 		return
+	} else {
+		if err := json.NewDecoder(_req.Body).Decode(&query); err != nil {
+			http.Error(_writer, err.Error(), http.StatusBadRequest)
+			return
+		}
 	}
-	defer _req.Body.Close()
 	code, data, msg = receiver.usersvc.PageUsers(
 		ctx,
 		query,
@@ -40,6 +45,8 @@ func (receiver *UsersvcHandlerImpl) PageUsers(_writer http.ResponseWriter, _req 
 	if msg != nil {
 		if errors.Is(msg, context.Canceled) {
 			http.Error(_writer, msg.Error(), http.StatusBadRequest)
+		} else if err, ok := msg.(*ddhttp.BizError); ok {
+			http.Error(_writer, err.Error(), err.StatusCode)
 		} else {
 			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
 		}
@@ -72,9 +79,15 @@ func (receiver *UsersvcHandlerImpl) GetUser(_writer http.ResponseWriter, _req *h
 	}
 	if _, exists := _req.Form["userId"]; exists {
 		userId = _req.FormValue("userId")
+	} else {
+		http.Error(_writer, "missing parameter userId", http.StatusBadRequest)
+		return
 	}
 	if _, exists := _req.Form["photo"]; exists {
 		photo = _req.FormValue("photo")
+	} else {
+		http.Error(_writer, "missing parameter photo", http.StatusBadRequest)
+		return
 	}
 	code, data, msg = receiver.usersvc.GetUser(
 		ctx,
@@ -84,6 +97,8 @@ func (receiver *UsersvcHandlerImpl) GetUser(_writer http.ResponseWriter, _req *h
 	if msg != nil {
 		if errors.Is(msg, context.Canceled) {
 			http.Error(_writer, msg.Error(), http.StatusBadRequest)
+		} else if err, ok := msg.(*ddhttp.BizError); ok {
+			http.Error(_writer, err.Error(), err.StatusCode)
 		} else {
 			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
 		}
@@ -118,6 +133,9 @@ func (receiver *UsersvcHandlerImpl) SignUp(_writer http.ResponseWriter, _req *ht
 	}
 	if _, exists := _req.Form["username"]; exists {
 		username = _req.FormValue("username")
+	} else {
+		http.Error(_writer, "missing parameter username", http.StatusBadRequest)
+		return
 	}
 	if _, exists := _req.Form["password"]; exists {
 		if casted, err := cast.ToIntE(_req.FormValue("password")); err != nil {
@@ -126,6 +144,9 @@ func (receiver *UsersvcHandlerImpl) SignUp(_writer http.ResponseWriter, _req *ht
 		} else {
 			password = casted
 		}
+	} else {
+		http.Error(_writer, "missing parameter password", http.StatusBadRequest)
+		return
 	}
 	if _, exists := _req.Form["actived"]; exists {
 		if casted, err := cast.ToBoolE(_req.FormValue("actived")); err != nil {
@@ -134,6 +155,9 @@ func (receiver *UsersvcHandlerImpl) SignUp(_writer http.ResponseWriter, _req *ht
 		} else {
 			actived = casted
 		}
+	} else {
+		http.Error(_writer, "missing parameter actived", http.StatusBadRequest)
+		return
 	}
 	if _, exists := _req.Form["score"]; exists {
 		if casted, err := cast.ToFloat64E(_req.FormValue("score")); err != nil {
@@ -142,6 +166,9 @@ func (receiver *UsersvcHandlerImpl) SignUp(_writer http.ResponseWriter, _req *ht
 		} else {
 			score = casted
 		}
+	} else {
+		http.Error(_writer, "missing parameter score", http.StatusBadRequest)
+		return
 	}
 	code, data, msg = receiver.usersvc.SignUp(
 		ctx,
@@ -153,6 +180,8 @@ func (receiver *UsersvcHandlerImpl) SignUp(_writer http.ResponseWriter, _req *ht
 	if msg != nil {
 		if errors.Is(msg, context.Canceled) {
 			http.Error(_writer, msg.Error(), http.StatusBadRequest)
+		} else if err, ok := msg.(*ddhttp.BizError); ok {
+			http.Error(_writer, err.Error(), err.StatusCode)
 		} else {
 			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
 		}
@@ -172,7 +201,7 @@ func (receiver *UsersvcHandlerImpl) SignUp(_writer http.ResponseWriter, _req *ht
 func (receiver *UsersvcHandlerImpl) UploadAvatar(_writer http.ResponseWriter, _req *http.Request) {
 	var (
 		pc context.Context
-		pf []*v3.FileModel
+		pf []v3.FileModel
 		ps string
 		ri int
 		rs string
@@ -183,17 +212,26 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar(_writer http.ResponseWriter, _r
 		http.Error(_writer, err.Error(), http.StatusBadRequest)
 		return
 	}
-	pfFileHeaders := _req.MultipartForm.File["pf"]
-	for _, _fh := range pfFileHeaders {
-		_f, err := _fh.Open()
-		if err != nil {
-			http.Error(_writer, err.Error(), http.StatusBadRequest)
+	pfFileHeaders, exists := _req.MultipartForm.File["pf"]
+	if exists {
+		if len(pfFileHeaders) == 0 {
+			http.Error(_writer, "no file uploaded for parameter pf", http.StatusBadRequest)
 			return
 		}
-		pf = append(pf, &v3.FileModel{
-			Filename: _fh.Filename,
-			Reader:   _f,
-		})
+		for _, _fh := range pfFileHeaders {
+			_f, err := _fh.Open()
+			if err != nil {
+				http.Error(_writer, err.Error(), http.StatusBadRequest)
+				return
+			}
+			pf = append(pf, v3.FileModel{
+				Filename: _fh.Filename,
+				Reader:   _f,
+			})
+		}
+	} else {
+		http.Error(_writer, "missing parameter pf", http.StatusBadRequest)
+		return
 	}
 	if err := _req.ParseForm(); err != nil {
 		http.Error(_writer, err.Error(), http.StatusBadRequest)
@@ -201,6 +239,9 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar(_writer http.ResponseWriter, _r
 	}
 	if _, exists := _req.Form["ps"]; exists {
 		ps = _req.FormValue("ps")
+	} else {
+		http.Error(_writer, "missing parameter ps", http.StatusBadRequest)
+		return
 	}
 	ri, rs, re = receiver.usersvc.UploadAvatar(
 		pc,
@@ -210,6 +251,8 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar(_writer http.ResponseWriter, _r
 	if re != nil {
 		if errors.Is(re, context.Canceled) {
 			http.Error(_writer, re.Error(), http.StatusBadRequest)
+		} else if err, ok := re.(*ddhttp.BizError); ok {
+			http.Error(_writer, err.Error(), err.StatusCode)
 		} else {
 			http.Error(_writer, re.Error(), http.StatusInternalServerError)
 		}
@@ -229,7 +272,7 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar(_writer http.ResponseWriter, _r
 func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _req *http.Request) {
 	var (
 		pc  context.Context
-		pf  []*v3.FileModel
+		pf  []v3.FileModel
 		ps  string
 		pf2 *v3.FileModel
 		pf3 *v3.FileModel
@@ -242,17 +285,26 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _
 		http.Error(_writer, err.Error(), http.StatusBadRequest)
 		return
 	}
-	pfFileHeaders := _req.MultipartForm.File["pf"]
-	for _, _fh := range pfFileHeaders {
-		_f, err := _fh.Open()
-		if err != nil {
-			http.Error(_writer, err.Error(), http.StatusBadRequest)
+	pfFileHeaders, exists := _req.MultipartForm.File["pf"]
+	if exists {
+		if len(pfFileHeaders) == 0 {
+			http.Error(_writer, "no file uploaded for parameter pf", http.StatusBadRequest)
 			return
 		}
-		pf = append(pf, &v3.FileModel{
-			Filename: _fh.Filename,
-			Reader:   _f,
-		})
+		for _, _fh := range pfFileHeaders {
+			_f, err := _fh.Open()
+			if err != nil {
+				http.Error(_writer, err.Error(), http.StatusBadRequest)
+				return
+			}
+			pf = append(pf, v3.FileModel{
+				Filename: _fh.Filename,
+				Reader:   _f,
+			})
+		}
+	} else {
+		http.Error(_writer, "missing parameter pf", http.StatusBadRequest)
+		return
 	}
 	if err := _req.ParseForm(); err != nil {
 		http.Error(_writer, err.Error(), http.StatusBadRequest)
@@ -260,31 +312,38 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _
 	}
 	if _, exists := _req.Form["ps"]; exists {
 		ps = _req.FormValue("ps")
+	} else {
+		http.Error(_writer, "missing parameter ps", http.StatusBadRequest)
+		return
 	}
-	pf2FileHeaders := _req.MultipartForm.File["pf2"]
-	if len(pf2FileHeaders) > 0 {
-		_fh := pf2FileHeaders[0]
-		_f, err := _fh.Open()
-		if err != nil {
-			http.Error(_writer, err.Error(), http.StatusBadRequest)
-			return
-		}
-		pf2 = &v3.FileModel{
-			Filename: _fh.Filename,
-			Reader:   _f,
+	pf2FileHeaders, exists := _req.MultipartForm.File["pf2"]
+	if exists {
+		if len(pf2FileHeaders) > 0 {
+			_fh := pf2FileHeaders[0]
+			_f, err := _fh.Open()
+			if err != nil {
+				http.Error(_writer, err.Error(), http.StatusBadRequest)
+				return
+			}
+			pf2 = &v3.FileModel{
+				Filename: _fh.Filename,
+				Reader:   _f,
+			}
 		}
 	}
-	pf3FileHeaders := _req.MultipartForm.File["pf3"]
-	if len(pf3FileHeaders) > 0 {
-		_fh := pf3FileHeaders[0]
-		_f, err := _fh.Open()
-		if err != nil {
-			http.Error(_writer, err.Error(), http.StatusBadRequest)
-			return
-		}
-		pf3 = &v3.FileModel{
-			Filename: _fh.Filename,
-			Reader:   _f,
+	pf3FileHeaders, exists := _req.MultipartForm.File["pf3"]
+	if exists {
+		if len(pf3FileHeaders) > 0 {
+			_fh := pf3FileHeaders[0]
+			_f, err := _fh.Open()
+			if err != nil {
+				http.Error(_writer, err.Error(), http.StatusBadRequest)
+				return
+			}
+			pf3 = &v3.FileModel{
+				Filename: _fh.Filename,
+				Reader:   _f,
+			}
 		}
 	}
 	ri, rs, re = receiver.usersvc.UploadAvatar2(
@@ -297,6 +356,8 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _
 	if re != nil {
 		if errors.Is(re, context.Canceled) {
 			http.Error(_writer, re.Error(), http.StatusBadRequest)
+		} else if err, ok := re.(*ddhttp.BizError); ok {
+			http.Error(_writer, err.Error(), err.StatusCode)
 		} else {
 			http.Error(_writer, re.Error(), http.StatusInternalServerError)
 		}
@@ -313,17 +374,11 @@ func (receiver *UsersvcHandlerImpl) UploadAvatar2(_writer http.ResponseWriter, _
 		return
 	}
 }
-
-func NewUsersvcHandler(usersvc service.Usersvc) UsersvcHandler {
-	return &UsersvcHandlerImpl{
-		usersvc,
-	}
-}
-
 func (receiver *UsersvcHandlerImpl) GetDownloadAvatar(_writer http.ResponseWriter, _req *http.Request) {
 	var (
 		ctx    context.Context
 		userId string
+		rs     string
 		rf     *os.File
 		re     error
 	)
@@ -334,14 +389,19 @@ func (receiver *UsersvcHandlerImpl) GetDownloadAvatar(_writer http.ResponseWrite
 	}
 	if _, exists := _req.Form["userId"]; exists {
 		userId = _req.FormValue("userId")
+	} else {
+		http.Error(_writer, "missing parameter userId", http.StatusBadRequest)
+		return
 	}
-	_, rf, re = receiver.usersvc.GetDownloadAvatar(
+	rs, rf, re = receiver.usersvc.GetDownloadAvatar(
 		ctx,
 		userId,
 	)
 	if re != nil {
 		if errors.Is(re, context.Canceled) {
 			http.Error(_writer, re.Error(), http.StatusBadRequest)
+		} else if err, ok := re.(*ddhttp.BizError); ok {
+			http.Error(_writer, err.Error(), err.StatusCode)
 		} else {
 			http.Error(_writer, re.Error(), http.StatusInternalServerError)
 		}
@@ -359,7 +419,282 @@ func (receiver *UsersvcHandlerImpl) GetDownloadAvatar(_writer http.ResponseWrite
 		return
 	}
 	_writer.Header().Set("Content-Disposition", "attachment; filename="+_fi.Name())
-	_writer.Header().Set("Content-Type", "application/octet-stream")
+	_writer.Header().Set("Content-Type", rs)
 	_writer.Header().Set("Content-Length", fmt.Sprintf("%d", _fi.Size()))
 	io.Copy(_writer, rf)
+}
+func (receiver *UsersvcHandlerImpl) GetUser2(_writer http.ResponseWriter, _req *http.Request) {
+	var (
+		ctx    context.Context
+		userId string
+		photo  *string
+		code   int
+		data   *string
+		msg    error
+	)
+	ctx = _req.Context()
+	if err := _req.ParseForm(); err != nil {
+		http.Error(_writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if _, exists := _req.Form["userId"]; exists {
+		userId = _req.FormValue("userId")
+	} else {
+		http.Error(_writer, "missing parameter userId", http.StatusBadRequest)
+		return
+	}
+	if _, exists := _req.Form["photo"]; exists {
+		_photo := _req.FormValue("photo")
+		photo = &_photo
+	}
+	code, data, msg = receiver.usersvc.GetUser2(
+		ctx,
+		userId,
+		photo,
+	)
+	if msg != nil {
+		if errors.Is(msg, context.Canceled) {
+			http.Error(_writer, msg.Error(), http.StatusBadRequest)
+		} else if err, ok := msg.(*ddhttp.BizError); ok {
+			http.Error(_writer, err.Error(), err.StatusCode)
+		} else {
+			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if err := json.NewEncoder(_writer).Encode(struct {
+		Code int     `json:"code"`
+		Data *string `json:"data"`
+	}{
+		Code: code,
+		Data: data,
+	}); err != nil {
+		http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+func (receiver *UsersvcHandlerImpl) PageUsers2(_writer http.ResponseWriter, _req *http.Request) {
+	var (
+		ctx   context.Context
+		query *vo.PageQuery
+		code  int
+		data  vo.PageRet
+		msg   error
+	)
+	ctx = _req.Context()
+	if _req.Body != nil {
+		if err := json.NewDecoder(_req.Body).Decode(&query); err != nil {
+			http.Error(_writer, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+	code, data, msg = receiver.usersvc.PageUsers2(
+		ctx,
+		query,
+	)
+	if msg != nil {
+		if errors.Is(msg, context.Canceled) {
+			http.Error(_writer, msg.Error(), http.StatusBadRequest)
+		} else if err, ok := msg.(*ddhttp.BizError); ok {
+			http.Error(_writer, err.Error(), err.StatusCode)
+		} else {
+			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if err := json.NewEncoder(_writer).Encode(struct {
+		Code int        `json:"code"`
+		Data vo.PageRet `json:"data"`
+	}{
+		Code: code,
+		Data: data,
+	}); err != nil {
+		http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+func (receiver *UsersvcHandlerImpl) GetUser3(_writer http.ResponseWriter, _req *http.Request) {
+	var (
+		ctx    context.Context
+		userId string
+		photo  *string
+		attrs  []int
+		pattrs *[]int
+		code   int
+		data   *string
+		msg    error
+	)
+	ctx = _req.Context()
+	if err := _req.ParseForm(); err != nil {
+		http.Error(_writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if _, exists := _req.Form["userId"]; exists {
+		userId = _req.FormValue("userId")
+	} else {
+		http.Error(_writer, "missing parameter userId", http.StatusBadRequest)
+		return
+	}
+	if _, exists := _req.Form["photo"]; exists {
+		_photo := _req.FormValue("photo")
+		photo = &_photo
+	}
+	if _, exists := _req.Form["attrs"]; exists {
+		if casted, err := cast.ToIntSliceE(_req.Form["attrs"]); err != nil {
+			http.Error(_writer, err.Error(), http.StatusBadRequest)
+			return
+		} else {
+			attrs = casted
+		}
+	} else {
+		if _, exists := _req.Form["attrs[]"]; exists {
+			if casted, err := cast.ToIntSliceE(_req.Form["attrs[]"]); err != nil {
+				http.Error(_writer, err.Error(), http.StatusBadRequest)
+				return
+			} else {
+				attrs = casted
+			}
+		} else {
+			http.Error(_writer, "missing parameter attrs", http.StatusBadRequest)
+			return
+		}
+	}
+	if _, exists := _req.Form["pattrs"]; exists {
+		if casted, err := cast.ToIntSliceE(_req.Form["pattrs"]); err != nil {
+			http.Error(_writer, err.Error(), http.StatusBadRequest)
+			return
+		} else {
+			pattrs = &casted
+		}
+	} else {
+		if _, exists := _req.Form["pattrs[]"]; exists {
+			if casted, err := cast.ToIntSliceE(_req.Form["pattrs[]"]); err != nil {
+				http.Error(_writer, err.Error(), http.StatusBadRequest)
+				return
+			} else {
+				pattrs = &casted
+			}
+		}
+	}
+	code, data, msg = receiver.usersvc.GetUser3(
+		ctx,
+		userId,
+		photo,
+		attrs,
+		pattrs,
+	)
+	if msg != nil {
+		if errors.Is(msg, context.Canceled) {
+			http.Error(_writer, msg.Error(), http.StatusBadRequest)
+		} else if err, ok := msg.(*ddhttp.BizError); ok {
+			http.Error(_writer, err.Error(), err.StatusCode)
+		} else {
+			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if err := json.NewEncoder(_writer).Encode(struct {
+		Code int     `json:"code"`
+		Data *string `json:"data"`
+	}{
+		Code: code,
+		Data: data,
+	}); err != nil {
+		http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+func (receiver *UsersvcHandlerImpl) GetUser4(_writer http.ResponseWriter, _req *http.Request) {
+	var (
+		ctx    context.Context
+		userId string
+		photo  *string
+		pattrs *[]int
+		attrs2 = new([]int)
+		code   int
+		data   *string
+		msg    error
+	)
+	ctx = _req.Context()
+	if err := _req.ParseForm(); err != nil {
+		http.Error(_writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if _, exists := _req.Form["userId"]; exists {
+		userId = _req.FormValue("userId")
+	} else {
+		http.Error(_writer, "missing parameter userId", http.StatusBadRequest)
+		return
+	}
+	if _, exists := _req.Form["photo"]; exists {
+		_photo := _req.FormValue("photo")
+		photo = &_photo
+	}
+	if _, exists := _req.Form["pattrs"]; exists {
+		if casted, err := cast.ToIntSliceE(_req.Form["pattrs"]); err != nil {
+			http.Error(_writer, err.Error(), http.StatusBadRequest)
+			return
+		} else {
+			pattrs = &casted
+		}
+	} else {
+		if _, exists := _req.Form["pattrs[]"]; exists {
+			if casted, err := cast.ToIntSliceE(_req.Form["pattrs[]"]); err != nil {
+				http.Error(_writer, err.Error(), http.StatusBadRequest)
+				return
+			} else {
+				pattrs = &casted
+			}
+		}
+	}
+	if _, exists := _req.Form["attrs2"]; exists {
+		if casted, err := cast.ToIntSliceE(_req.Form["attrs2"]); err != nil {
+			http.Error(_writer, err.Error(), http.StatusBadRequest)
+			return
+		} else {
+			attrs2 = &casted
+		}
+	} else {
+		if _, exists := _req.Form["attrs2[]"]; exists {
+			if casted, err := cast.ToIntSliceE(_req.Form["attrs2[]"]); err != nil {
+				http.Error(_writer, err.Error(), http.StatusBadRequest)
+				return
+			} else {
+				attrs2 = &casted
+			}
+		}
+	}
+	code, data, msg = receiver.usersvc.GetUser4(
+		ctx,
+		userId,
+		photo,
+		pattrs,
+		*attrs2...,
+	)
+	if msg != nil {
+		if errors.Is(msg, context.Canceled) {
+			http.Error(_writer, msg.Error(), http.StatusBadRequest)
+		} else if err, ok := msg.(*ddhttp.BizError); ok {
+			http.Error(_writer, err.Error(), err.StatusCode)
+		} else {
+			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if err := json.NewEncoder(_writer).Encode(struct {
+		Code int     `json:"code"`
+		Data *string `json:"data"`
+	}{
+		Code: code,
+		Data: data,
+	}); err != nil {
+		http.Error(_writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func NewUsersvcHandler(usersvc service.Usersvc) UsersvcHandler {
+	return &UsersvcHandlerImpl{
+		usersvc,
+	}
 }

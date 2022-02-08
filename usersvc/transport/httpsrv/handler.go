@@ -13,6 +13,10 @@ type UsersvcHandler interface {
 	UploadAvatar(w http.ResponseWriter, r *http.Request)
 	UploadAvatar2(w http.ResponseWriter, r *http.Request)
 	GetDownloadAvatar(w http.ResponseWriter, r *http.Request)
+	GetUser2(w http.ResponseWriter, r *http.Request)
+	PageUsers2(w http.ResponseWriter, r *http.Request)
+	GetUser3(w http.ResponseWriter, r *http.Request)
+	GetUser4(w http.ResponseWriter, r *http.Request)
 }
 
 func Routes(handler UsersvcHandler) []ddmodel.Route {
@@ -52,6 +56,30 @@ func Routes(handler UsersvcHandler) []ddmodel.Route {
 			"GET",
 			"/download/avatar",
 			handler.GetDownloadAvatar,
+		},
+		{
+			"User2",
+			"GET",
+			"/user/2",
+			handler.GetUser2,
+		},
+		{
+			"PageUsers2",
+			"POST",
+			"/page/users/2",
+			handler.PageUsers2,
+		},
+		{
+			"User3",
+			"GET",
+			"/user/3",
+			handler.GetUser3,
+		},
+		{
+			"User4",
+			"GET",
+			"/user/4",
+			handler.GetUser4,
 		},
 	}
 }

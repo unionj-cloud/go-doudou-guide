@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"time"
-	service "usersvc"
 	"usersvc/vo"
 
 	"github.com/pkg/errors"
@@ -21,14 +20,14 @@ import (
 )
 
 type UsersvcClientProxy struct {
-	client service.Usersvc
+	client *UsersvcClient
 	logger *logrus.Logger
 	runner goresilience.Runner
 }
 
 func (receiver *UsersvcClientProxy) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		code, data, msg = receiver.client.PageUsers(
+		_, code, data, msg = receiver.client.PageUsers(
 			ctx,
 			query,
 		)
@@ -47,7 +46,7 @@ func (receiver *UsersvcClientProxy) PageUsers(ctx context.Context, query vo.Page
 }
 func (receiver *UsersvcClientProxy) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		code, data, msg = receiver.client.GetUser(
+		_, code, data, msg = receiver.client.GetUser(
 			ctx,
 			userId,
 			photo,
@@ -67,7 +66,7 @@ func (receiver *UsersvcClientProxy) GetUser(ctx context.Context, userId string, 
 }
 func (receiver *UsersvcClientProxy) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		code, data, msg = receiver.client.SignUp(
+		_, code, data, msg = receiver.client.SignUp(
 			ctx,
 			username,
 			password,
@@ -87,9 +86,9 @@ func (receiver *UsersvcClientProxy) SignUp(ctx context.Context, username string,
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) UploadAvatar(pc context.Context, pf []*v3.FileModel, ps string) (ri int, rs string, re error) {
+func (receiver *UsersvcClientProxy) UploadAvatar(pc context.Context, pf []v3.FileModel, ps string) (ri int, rs string, re error) {
 	if _err := receiver.runner.Run(pc, func(ctx context.Context) error {
-		ri, rs, re = receiver.client.UploadAvatar(
+		_, ri, rs, re = receiver.client.UploadAvatar(
 			pc,
 			pf,
 			ps,
@@ -107,9 +106,9 @@ func (receiver *UsersvcClientProxy) UploadAvatar(pc context.Context, pf []*v3.Fi
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) UploadAvatar2(pc context.Context, pf []*v3.FileModel, ps string, pf2 *v3.FileModel, pf3 *v3.FileModel) (ri int, rs string, re error) {
+func (receiver *UsersvcClientProxy) UploadAvatar2(pc context.Context, pf []v3.FileModel, ps string, pf2 *v3.FileModel, pf3 *v3.FileModel) (ri int, rs string, re error) {
 	if _err := receiver.runner.Run(pc, func(ctx context.Context) error {
-		ri, rs, re = receiver.client.UploadAvatar2(
+		_, ri, rs, re = receiver.client.UploadAvatar2(
 			pc,
 			pf,
 			ps,
@@ -129,6 +128,104 @@ func (receiver *UsersvcClientProxy) UploadAvatar2(pc context.Context, pf []*v3.F
 	}
 	return
 }
+func (receiver *UsersvcClientProxy) GetDownloadAvatar(ctx context.Context, userId string) (rs string, rf *os.File, re error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		_, rs, rf, re = receiver.client.GetDownloadAvatar(
+			ctx,
+			userId,
+		)
+		if re != nil {
+			return errors.Wrap(re, "call GetDownloadAvatar fail")
+		}
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+		re = errors.Wrap(_err, "call GetDownloadAvatar fail")
+	}
+	return
+}
+func (receiver *UsersvcClientProxy) GetUser2(ctx context.Context, userId string, photo *string) (code int, data *string, msg error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		_, code, data, msg = receiver.client.GetUser2(
+			ctx,
+			userId,
+			photo,
+		)
+		if msg != nil {
+			return errors.Wrap(msg, "call GetUser2 fail")
+		}
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+		msg = errors.Wrap(_err, "call GetUser2 fail")
+	}
+	return
+}
+func (receiver *UsersvcClientProxy) PageUsers2(ctx context.Context, query *vo.PageQuery) (code int, data vo.PageRet, msg error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		_, code, data, msg = receiver.client.PageUsers2(
+			ctx,
+			query,
+		)
+		if msg != nil {
+			return errors.Wrap(msg, "call PageUsers2 fail")
+		}
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+		msg = errors.Wrap(_err, "call PageUsers2 fail")
+	}
+	return
+}
+func (receiver *UsersvcClientProxy) GetUser3(ctx context.Context, userId string, photo *string, attrs []int, pattrs *[]int) (code int, data *string, msg error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		_, code, data, msg = receiver.client.GetUser3(
+			ctx,
+			userId,
+			photo,
+			attrs,
+			pattrs,
+		)
+		if msg != nil {
+			return errors.Wrap(msg, "call GetUser3 fail")
+		}
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+		msg = errors.Wrap(_err, "call GetUser3 fail")
+	}
+	return
+}
+func (receiver *UsersvcClientProxy) GetUser4(ctx context.Context, userId string, photo *string, pattrs *[]int, attrs2 ...int) (code int, data *string, msg error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		_, code, data, msg = receiver.client.GetUser4(
+			ctx,
+			userId,
+			photo,
+			pattrs,
+			attrs2...,
+		)
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+	}
+	return
+}
 
 type ProxyOption func(*UsersvcClientProxy)
 
@@ -144,7 +241,7 @@ func WithLogger(logger *logrus.Logger) ProxyOption {
 	}
 }
 
-func NewUsersvcClientProxy(client service.Usersvc, opts ...ProxyOption) *UsersvcClientProxy {
+func NewUsersvcClientProxy(client *UsersvcClient, opts ...ProxyOption) *UsersvcClientProxy {
 	cp := &UsersvcClientProxy{
 		client: client,
 		logger: logrus.StandardLogger(),
@@ -180,24 +277,4 @@ func NewUsersvcClientProxy(client service.Usersvc, opts ...ProxyOption) *Usersvc
 	}
 
 	return cp
-}
-
-func (receiver *UsersvcClientProxy) GetDownloadAvatar(ctx context.Context, userId string) (rs string, rf *os.File, re error) {
-	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		rs, rf, re = receiver.client.GetDownloadAvatar(
-			ctx,
-			userId,
-		)
-		if re != nil {
-			return errors.Wrap(re, "call GetDownloadAvatar fail")
-		}
-		return nil
-	}); _err != nil {
-		// you can implement your fallback logic here
-		if errors.Is(_err, rerrors.ErrCircuitOpen) {
-			receiver.logger.Error(_err)
-		}
-		re = errors.Wrap(_err, "call GetDownloadAvatar fail")
-	}
-	return
 }

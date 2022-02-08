@@ -36,7 +36,7 @@ func (receiver *UsersvcClient) SetProvider(provider registry.IServiceProvider) {
 func (receiver *UsersvcClient) SetClient(client *resty.Client) {
 	receiver.client = client
 }
-func (receiver *UsersvcClient) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
+func (receiver *UsersvcClient) PageUsers(ctx context.Context, query vo.PageQuery) (_resp *resty.Response, code int, data vo.PageRet, msg error) {
 	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
@@ -48,9 +48,9 @@ func (receiver *UsersvcClient) PageUsers(ctx context.Context, query vo.PageQuery
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_path)
+	_resp, _err = _req.Post(_path)
 	if _err != nil {
-		msg = errors.Wrap(_err, "")
+		msg = errors.Wrap(_err, "error")
 		return
 	}
 	if _resp.IsError() {
@@ -60,19 +60,14 @@ func (receiver *UsersvcClient) PageUsers(ctx context.Context, query vo.PageQuery
 	var _result struct {
 		Code int        `json:"code"`
 		Data vo.PageRet `json:"data"`
-		Msg  string     `json:"msg"`
 	}
 	if _err = json.Unmarshal(_resp.Body(), &_result); _err != nil {
-		msg = errors.Wrap(_err, "")
+		msg = errors.Wrap(_err, "error")
 		return
 	}
-	if stringutils.IsNotEmpty(_result.Msg) {
-		msg = errors.New(_result.Msg)
-		return
-	}
-	return _result.Code, _result.Data, nil
+	return _resp, _result.Code, _result.Data, nil
 }
-func (receiver *UsersvcClient) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
+func (receiver *UsersvcClient) GetUser(ctx context.Context, userId string, photo string) (_resp *resty.Response, code int, data string, msg error) {
 	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
@@ -80,10 +75,10 @@ func (receiver *UsersvcClient) GetUser(ctx context.Context, userId string, photo
 	_urlValues.Set("userId", fmt.Sprintf("%v", userId))
 	_urlValues.Set("photo", fmt.Sprintf("%v", photo))
 	_path := "/user"
-	_resp, _err := _req.SetQueryParamsFromValues(_urlValues).
+	_resp, _err = _req.SetQueryParamsFromValues(_urlValues).
 		Get(_path)
 	if _err != nil {
-		msg = errors.Wrap(_err, "")
+		msg = errors.Wrap(_err, "error")
 		return
 	}
 	if _resp.IsError() {
@@ -93,19 +88,14 @@ func (receiver *UsersvcClient) GetUser(ctx context.Context, userId string, photo
 	var _result struct {
 		Code int    `json:"code"`
 		Data string `json:"data"`
-		Msg  string `json:"msg"`
 	}
 	if _err = json.Unmarshal(_resp.Body(), &_result); _err != nil {
-		msg = errors.Wrap(_err, "")
+		msg = errors.Wrap(_err, "error")
 		return
 	}
-	if stringutils.IsNotEmpty(_result.Msg) {
-		msg = errors.New(_result.Msg)
-		return
-	}
-	return _result.Code, _result.Data, nil
+	return _resp, _result.Code, _result.Data, nil
 }
-func (receiver *UsersvcClient) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
+func (receiver *UsersvcClient) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (_resp *resty.Response, code int, data string, msg error) {
 	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
@@ -120,9 +110,9 @@ func (receiver *UsersvcClient) SignUp(ctx context.Context, username string, pass
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_path)
+	_resp, _err = _req.Post(_path)
 	if _err != nil {
-		msg = errors.Wrap(_err, "")
+		msg = errors.Wrap(_err, "error")
 		return
 	}
 	if _resp.IsError() {
@@ -132,23 +122,22 @@ func (receiver *UsersvcClient) SignUp(ctx context.Context, username string, pass
 	var _result struct {
 		Code int    `json:"code"`
 		Data string `json:"data"`
-		Msg  string `json:"msg"`
 	}
 	if _err = json.Unmarshal(_resp.Body(), &_result); _err != nil {
-		msg = errors.Wrap(_err, "")
+		msg = errors.Wrap(_err, "error")
 		return
 	}
-	if stringutils.IsNotEmpty(_result.Msg) {
-		msg = errors.New(_result.Msg)
-		return
-	}
-	return _result.Code, _result.Data, nil
+	return _resp, _result.Code, _result.Data, nil
 }
-func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []*v3.FileModel, ps string) (ri int, rs string, re error) {
+func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []v3.FileModel, ps string) (_resp *resty.Response, ri int, rs string, re error) {
 	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
 	_req.SetContext(pc)
+	if len(pf) == 0 {
+		re = errors.New("at least one file should be uploaded for parameter pf")
+		return
+	}
 	for _, _f := range pf {
 		_req.SetFileReader("pf", _f.Filename, _f.Reader)
 	}
@@ -159,9 +148,9 @@ func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []*v3.FileMod
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_path)
+	_resp, _err = _req.Post(_path)
 	if _err != nil {
-		re = errors.Wrap(_err, "")
+		re = errors.Wrap(_err, "error")
 		return
 	}
 	if _resp.IsError() {
@@ -171,38 +160,41 @@ func (receiver *UsersvcClient) UploadAvatar(pc context.Context, pf []*v3.FileMod
 	var _result struct {
 		Ri int    `json:"ri"`
 		Rs string `json:"rs"`
-		Re string `json:"re"`
 	}
 	if _err = json.Unmarshal(_resp.Body(), &_result); _err != nil {
-		re = errors.Wrap(_err, "")
+		re = errors.Wrap(_err, "error")
 		return
 	}
-	if stringutils.IsNotEmpty(_result.Re) {
-		re = errors.New(_result.Re)
-		return
-	}
-	return _result.Ri, _result.Rs, nil
+	return _resp, _result.Ri, _result.Rs, nil
 }
-func (receiver *UsersvcClient) UploadAvatar2(pc context.Context, pf []*v3.FileModel, ps string, pf2 *v3.FileModel, pf3 *v3.FileModel) (ri int, rs string, re error) {
+func (receiver *UsersvcClient) UploadAvatar2(pc context.Context, pf []v3.FileModel, ps string, pf2 *v3.FileModel, pf3 *v3.FileModel) (_resp *resty.Response, ri int, rs string, re error) {
 	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
 	_req.SetContext(pc)
+	if len(pf) == 0 {
+		re = errors.New("at least one file should be uploaded for parameter pf")
+		return
+	}
 	for _, _f := range pf {
 		_req.SetFileReader("pf", _f.Filename, _f.Reader)
 	}
 	_urlValues.Set("ps", fmt.Sprintf("%v", ps))
-	_req.SetFileReader("pf2", pf2.Filename, pf2.Reader)
-	_req.SetFileReader("pf3", pf3.Filename, pf3.Reader)
+	if pf2 != nil {
+		_req.SetFileReader("pf2", pf2.Filename, pf2.Reader)
+	}
+	if pf3 != nil {
+		_req.SetFileReader("pf3", pf3.Filename, pf3.Reader)
+	}
 	_path := "/upload/avatar/2"
 	if _req.Body != nil {
 		_req.SetQueryParamsFromValues(_urlValues)
 	} else {
 		_req.SetFormDataFromValues(_urlValues)
 	}
-	_resp, _err := _req.Post(_path)
+	_resp, _err = _req.Post(_path)
 	if _err != nil {
-		re = errors.Wrap(_err, "")
+		re = errors.Wrap(_err, "error")
 		return
 	}
 	if _resp.IsError() {
@@ -212,19 +204,14 @@ func (receiver *UsersvcClient) UploadAvatar2(pc context.Context, pf []*v3.FileMo
 	var _result struct {
 		Ri int    `json:"ri"`
 		Rs string `json:"rs"`
-		Re string `json:"re"`
 	}
 	if _err = json.Unmarshal(_resp.Body(), &_result); _err != nil {
-		re = errors.Wrap(_err, "")
+		re = errors.Wrap(_err, "error")
 		return
 	}
-	if stringutils.IsNotEmpty(_result.Re) {
-		re = errors.New(_result.Re)
-		return
-	}
-	return _result.Ri, _result.Rs, nil
+	return _resp, _result.Ri, _result.Rs, nil
 }
-func (receiver *UsersvcClient) GetDownloadAvatar(ctx context.Context, userId string) (rs string, rf *os.File, re error) {
+func (receiver *UsersvcClient) GetDownloadAvatar(ctx context.Context, userId string) (_resp *resty.Response, rs string, rf *os.File, re error) {
 	var _err error
 	_urlValues := url.Values{}
 	_req := receiver.client.R()
@@ -232,10 +219,10 @@ func (receiver *UsersvcClient) GetDownloadAvatar(ctx context.Context, userId str
 	_urlValues.Set("userId", fmt.Sprintf("%v", userId))
 	_req.SetDoNotParseResponse(true)
 	_path := "/download/avatar"
-	_resp, _err := _req.SetQueryParamsFromValues(_urlValues).
+	_resp, _err = _req.SetQueryParamsFromValues(_urlValues).
 		Get(_path)
 	if _err != nil {
-		re = errors.Wrap(_err, "")
+		re = errors.Wrap(_err, "error")
 		return
 	}
 	if _resp.IsError() {
@@ -250,26 +237,169 @@ func (receiver *UsersvcClient) GetDownloadAvatar(ctx context.Context, userId str
 	}
 	_file = filepath.Clean(_file)
 	if _err = fileutils.CreateDirectory(filepath.Dir(_file)); _err != nil {
-		re = errors.Wrap(_err, "")
+		re = errors.Wrap(_err, "error")
 		return
 	}
 	_outFile, _err := os.Create(_file)
 	if _err != nil {
-		re = errors.Wrap(_err, "")
+		re = errors.Wrap(_err, "error")
 		return
 	}
 	defer _outFile.Close()
 	defer _resp.RawBody().Close()
 	_, _err = io.Copy(_outFile, _resp.RawBody())
 	if _err != nil {
-		re = errors.Wrap(_err, "")
+		re = errors.Wrap(_err, "error")
 		return
 	}
 	rf = _outFile
 	return
 }
+func (receiver *UsersvcClient) GetUser2(ctx context.Context, userId string, photo *string) (_resp *resty.Response, code int, data *string, msg error) {
+	var _err error
+	_urlValues := url.Values{}
+	_req := receiver.client.R()
+	_req.SetContext(ctx)
+	_urlValues.Set("userId", fmt.Sprintf("%v", userId))
+	if photo != nil {
+		_urlValues.Set("photo", fmt.Sprintf("%v", *photo))
+	}
+	_path := "/user/2"
+	_resp, _err = _req.SetQueryParamsFromValues(_urlValues).
+		Get(_path)
+	if _err != nil {
+		msg = errors.Wrap(_err, "error")
+		return
+	}
+	if _resp.IsError() {
+		msg = errors.New(_resp.String())
+		return
+	}
+	var _result struct {
+		Code int     `json:"code"`
+		Data *string `json:"data"`
+	}
+	if _err = json.Unmarshal(_resp.Body(), &_result); _err != nil {
+		msg = errors.Wrap(_err, "error")
+		return
+	}
+	return _resp, _result.Code, _result.Data, nil
+}
+func (receiver *UsersvcClient) PageUsers2(ctx context.Context, query *vo.PageQuery) (_resp *resty.Response, code int, data vo.PageRet, msg error) {
+	var _err error
+	_urlValues := url.Values{}
+	_req := receiver.client.R()
+	_req.SetContext(ctx)
+	_req.SetBody(query)
+	_path := "/page/users/2"
+	if _req.Body != nil {
+		_req.SetQueryParamsFromValues(_urlValues)
+	} else {
+		_req.SetFormDataFromValues(_urlValues)
+	}
+	_resp, _err = _req.Post(_path)
+	if _err != nil {
+		msg = errors.Wrap(_err, "error")
+		return
+	}
+	if _resp.IsError() {
+		msg = errors.New(_resp.String())
+		return
+	}
+	var _result struct {
+		Code int        `json:"code"`
+		Data vo.PageRet `json:"data"`
+	}
+	if _err = json.Unmarshal(_resp.Body(), &_result); _err != nil {
+		msg = errors.Wrap(_err, "error")
+		return
+	}
+	return _resp, _result.Code, _result.Data, nil
+}
+func (receiver *UsersvcClient) GetUser3(ctx context.Context, userId string, photo *string, attrs []int, pattrs *[]int) (_resp *resty.Response, code int, data *string, msg error) {
+	var _err error
+	_urlValues := url.Values{}
+	_req := receiver.client.R()
+	_req.SetContext(ctx)
+	_urlValues.Set("userId", fmt.Sprintf("%v", userId))
+	if photo != nil {
+		_urlValues.Set("photo", fmt.Sprintf("%v", *photo))
+	}
+	if len(attrs) == 0 {
+		msg = errors.New("size of parameter attrs should be greater than zero")
+		return
+	}
+	for _, _item := range attrs {
+		_urlValues.Add("attrs", fmt.Sprintf("%v", _item))
+	}
+	if pattrs != nil {
+		for _, _item := range *pattrs {
+			_urlValues.Add("pattrs", fmt.Sprintf("%v", _item))
+		}
+	}
+	_path := "/user/3"
+	_resp, _err = _req.SetQueryParamsFromValues(_urlValues).
+		Get(_path)
+	if _err != nil {
+		msg = errors.Wrap(_err, "error")
+		return
+	}
+	if _resp.IsError() {
+		msg = errors.New(_resp.String())
+		return
+	}
+	var _result struct {
+		Code int     `json:"code"`
+		Data *string `json:"data"`
+	}
+	if _err = json.Unmarshal(_resp.Body(), &_result); _err != nil {
+		msg = errors.Wrap(_err, "error")
+		return
+	}
+	return _resp, _result.Code, _result.Data, nil
+}
+func (receiver *UsersvcClient) GetUser4(ctx context.Context, userId string, photo *string, pattrs *[]int, attrs2 ...int) (_resp *resty.Response, code int, data *string, msg error) {
+	var _err error
+	_urlValues := url.Values{}
+	_req := receiver.client.R()
+	_req.SetContext(ctx)
+	_urlValues.Set("userId", fmt.Sprintf("%v", userId))
+	if photo != nil {
+		_urlValues.Set("photo", fmt.Sprintf("%v", *photo))
+	}
+	if pattrs != nil {
+		for _, _item := range *pattrs {
+			_urlValues.Add("pattrs", fmt.Sprintf("%v", _item))
+		}
+	}
+	if attrs2 != nil {
+		for _, _item := range attrs2 {
+			_urlValues.Add("attrs2", fmt.Sprintf("%v", _item))
+		}
+	}
+	_path := "/user/4"
+	_resp, _err = _req.SetQueryParamsFromValues(_urlValues).
+		Get(_path)
+	if _err != nil {
+		msg = errors.Wrap(_err, "error")
+		return
+	}
+	if _resp.IsError() {
+		msg = errors.New(_resp.String())
+		return
+	}
+	var _result struct {
+		Code int     `json:"code"`
+		Data *string `json:"data"`
+	}
+	if _err = json.Unmarshal(_resp.Body(), &_result); _err != nil {
+		msg = errors.Wrap(_err, "error")
+		return
+	}
+	return _resp, _result.Code, _result.Data, nil
+}
 
-func NewUsersvc(opts ...ddhttp.DdClientOption) *UsersvcClient {
+func NewUsersvcClient(opts ...ddhttp.DdClientOption) *UsersvcClient {
 	defaultProvider := ddhttp.NewServiceProvider("USERSVC")
 	defaultClient := ddhttp.NewClient()
 

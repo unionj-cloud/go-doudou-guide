@@ -9,8 +9,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/unionj-cloud/cast v1.3.2
-	github.com/unionj-cloud/go-doudou v0.9.7
-	github.com/unionj-cloud/memberlist v0.2.14
+	github.com/unionj-cloud/go-doudou v0.9.8
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 

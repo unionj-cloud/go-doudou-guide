@@ -31,13 +31,13 @@ type Usersvc interface {
 	SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error)
 
 	// UploadAvatar demonstrate how to define upload files api
-	// there must be one []*v3.FileModel or *v3.FileModel parameter among input parameters
+	// there must be one []v3.FileModel or v3.FileModel parameter among input parameters
 	// remember to close the readers by Close method of v3.FileModel if you don't need them anymore when you finished your own business logic
-	UploadAvatar(context.Context, []*v3.FileModel, string) (int, string, error)
+	UploadAvatar(context.Context, []v3.FileModel, string) (int, string, error)
 
 	// UploadAvatar2 demonstrate how to define upload files api
 	// remember to close the readers by Close method of v3.FileModel if you don't need them anymore when you finished your own business logic
-	UploadAvatar2(context.Context, []*v3.FileModel, string, *v3.FileModel, *v3.FileModel) (int, string, error)
+	UploadAvatar2(context.Context, []v3.FileModel, string, *v3.FileModel, *v3.FileModel) (int, string, error)
 
 	// GetDownloadAvatar demonstrate how to define download file api
 	// there must be *os.File parameter among output parameters
@@ -52,4 +52,36 @@ type Usersvc interface {
 		string,
 		// download file
 		*os.File, error)
+
+	// GetUser2 demonstrate how to define GET api with query string parameters
+	GetUser2(ctx context.Context,
+		// user id
+		// comments above input and output basic type parameters will display on online document
+		userId string, photo *string) (code int, data *string, msg error)
+
+	// PageUsers2 demonstrate how to define POST and Content-Type as application/json api
+	PageUsers2(ctx context.Context,
+		// comments above input and output struct type parameters in vo package will display on online document
+		// not comments here
+		query *vo.PageQuery) (
+		// it indicates there is an error if code is not 0
+		code int,
+		// page data
+		data vo.PageRet,
+		// error message
+		msg error)
+
+	// GetUser3 demonstrate how to define GET api with query string parameters
+	GetUser3(ctx context.Context,
+		// user id
+		// comments above input and output basic type parameters will display on online document
+		userId string, photo *string, attrs []int, pattrs *[]int) (code int, data *string, msg error)
+
+	// GetUser4 demonstrate how to define GET api with query string parameters
+	// photo *string, pattrs *[]int 是一类问题， TODO
+	// attrs2 []int 是一类问题
+	GetUser4(ctx context.Context,
+		// user id
+		// comments above input and output basic type parameters will display on online document
+		userId string, photo *string, pattrs *[]int, attrs2 ...int) (code int, data *string, msg error)
 }
