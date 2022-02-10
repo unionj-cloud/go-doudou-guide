@@ -9,13 +9,12 @@ import (
 	"usersvc/config"
 	"usersvc/vo"
 
-	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
+	ddhttp "github.com/unionj-cloud/go-doudou/framework/http"
 
-	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"
+	v3 "github.com/unionj-cloud/go-doudou/toolkit/openapi/v3"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
-	ddconfig "github.com/unionj-cloud/go-doudou/svc/config"
 )
 
 type UsersvcImpl struct {
@@ -36,7 +35,7 @@ func (receiver *UsersvcImpl) GetDownloadAvatar(ctx context.Context, userId strin
 	// Setting output directory path, If directory not exists then resty creates one!
 	// This is optional one, if you're planning using absoule path in
 	// `Request.SetOutput` and can used together.
-	client.SetOutputDirectory(ddconfig.GddOutput.Load())
+	client.SetOutputDirectory(os.TempDir())
 
 	// HTTP response gets saved into file, similar to curl -o flag
 	resp, err := client.R().
@@ -46,7 +45,7 @@ func (receiver *UsersvcImpl) GetDownloadAvatar(ctx context.Context, userId strin
 		return "", nil, err
 	}
 	mimetype := resp.Header().Get("Content-Type")
-	f, err := os.Open(ddconfig.GddOutput.Load() + "/" + fileName)
+	f, err := os.Open(os.TempDir() + "/" + fileName)
 	return mimetype, f, err
 }
 
@@ -87,7 +86,7 @@ func (receiver *UsersvcImpl) GetUser3(ctx context.Context, userId string, photo 
 
 func saveFile(fm *v3.FileModel) error {
 	defer fm.Close()
-	f, err := os.OpenFile(ddconfig.GddOutput.Load()+"/"+fm.Filename, os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	f, err := os.OpenFile(os.TempDir()+"/"+fm.Filename, os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return errors.Wrapf(err, "call os.OpenFile error")
 	}
@@ -100,7 +99,7 @@ func saveFile(fm *v3.FileModel) error {
 }
 
 //func (receiver *UsersvcImpl) UploadAvatar2(ctx context.Context, headers []*v3.FileModel, s string, header *v3.FileModel, header2 *v3.FileModel) (int, string, error) {
-//	_ = os.MkdirAll(ddconfig.GddOutput.Load(), os.ModePerm)
+//	_ = os.MkdirAll(os.TempDir(), os.ModePerm)
 //	for _, fh := range headers {
 //		if err := saveFile(fh); err != nil {
 //			return 1, "", errors.Wrapf(err, "call saveFile error")
@@ -123,7 +122,7 @@ func saveFile(fm *v3.FileModel) error {
 //	if len(avatar) == 0 {
 //		return 1, "", errors.New("no file upload")
 //	}
-//	_ = os.MkdirAll(ddconfig.GddOutput.Load(), os.ModePerm)
+//	_ = os.MkdirAll(os.TempDir(), os.ModePerm)
 //	err := saveFile(avatar[0])
 //	if err != nil {
 //		return 1, "", errors.Wrap(err, "save file failed")

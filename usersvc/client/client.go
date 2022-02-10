@@ -16,12 +16,11 @@ import (
 	"github.com/opentracing-contrib/go-stdlib/nethttp"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
-	"github.com/unionj-cloud/go-doudou/fileutils"
-	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"
-	"github.com/unionj-cloud/go-doudou/stringutils"
-	"github.com/unionj-cloud/go-doudou/svc/config"
-	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
-	"github.com/unionj-cloud/go-doudou/svc/registry"
+	ddhttp "github.com/unionj-cloud/go-doudou/framework/http"
+	"github.com/unionj-cloud/go-doudou/framework/registry"
+	"github.com/unionj-cloud/go-doudou/toolkit/fileutils"
+	v3 "github.com/unionj-cloud/go-doudou/toolkit/openapi/v3"
+	"github.com/unionj-cloud/go-doudou/toolkit/stringutils"
 )
 
 type UsersvcClient struct {
@@ -231,7 +230,7 @@ func (receiver *UsersvcClient) GetDownloadAvatar(ctx context.Context, userId str
 	}
 	_disp := _resp.Header().Get("Content-Disposition")
 	_file := strings.TrimPrefix(_disp, "attachment; filename=")
-	_output := config.GddOutput.Load()
+	_output := os.TempDir()
 	if stringutils.IsNotEmpty(_output) {
 		_file = _output + string(filepath.Separator) + _file
 	}

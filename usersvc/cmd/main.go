@@ -1,38 +1,30 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"github.com/ascarter/requestid"
-	"github.com/go-redis/redis/v8"
-	"github.com/gorilla/handlers"
 	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
-	"github.com/unionj-cloud/go-doudou/ratelimit"
-	"github.com/unionj-cloud/go-doudou/ratelimit/redisrate"
-	ddconfig "github.com/unionj-cloud/go-doudou/svc/config"
-	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
-	"github.com/unionj-cloud/go-doudou/svc/logger"
-	"github.com/unionj-cloud/go-doudou/svc/registry"
-	"github.com/unionj-cloud/go-doudou/svc/tracing"
+	ddhttp "github.com/unionj-cloud/go-doudou/framework/http"
+	"github.com/unionj-cloud/go-doudou/framework/logger"
+	"github.com/unionj-cloud/go-doudou/framework/registry"
+	"github.com/unionj-cloud/go-doudou/framework/tracing"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 	service "usersvc"
 	"usersvc/config"
 	"usersvc/transport/httpsrv"
 )
 
 func main() {
-	ddconfig.InitEnv()
 	conf := config.LoadFromEnv()
-
 	if logger.CheckDev() {
 		logger.Init(logger.WithWritter(os.Stdout))
 	} else {
 		logger.Init(logger.WithWritter(io.MultiWriter(os.Stdout, &lumberjack.Logger{
-			Filename:   filepath.Join(os.Getenv("LOG_PATH"), fmt.Sprintf("%s.log", ddconfig.GddServiceName.Load())),
+			Filename:   filepath.Join(os.Getenv("LOG_PATH"), fmt.Sprintf("%s.log", "usersvc")),
 			MaxSize:    5,  // Max megabytes before log is rotated
 			MaxBackups: 10, // Max number of old log files to keep
 			MaxAge:     7,  // Max number of days to retain log files
@@ -40,7 +32,7 @@ func main() {
 		})))
 	}
 
-	if ddconfig.GddMode.Load() == "micro" {
+	if os.Getenv("GDD_MODE") == "micro" {
 		err := registry.NewNode()
 		if err != nil {
 			logrus.Panicln(fmt.Sprintf("%+v", err))
@@ -63,21 +55,19 @@ func main() {
 	//	}))
 	//})
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
-	})
+	//rdb := redis.NewClient(&redis.Options{
+	//	Addr: "localhost:6379",
+	//})
+	//
+	//fn := redisrate.LimitFn(func(ctx context.Context) ratelimit.Limit {
+	//	return ratelimit.PerSecondBurst(10, 30)
+	//})
 
-	fn := redisrate.LimitFn(func(ctx context.Context) ratelimit.Limit {
-		return ratelimit.PerSecondBurst(10, 30)
-	})
-
-	srv.AddMiddleware(ddhttp.Tracing, ddhttp.Metrics,
-		//ddhttp.BulkHead(1, 10*time.Millisecond),
-		requestid.RequestIDHandler, handlers.CompressHandler, handlers.ProxyHeaders,
+	srv.AddMiddleware(
+		ddhttp.BulkHead(1, 10*time.Millisecond),
 		//httpsrv.RateLimit(store),
-		httpsrv.RedisRateLimit(rdb, fn),
-		ddhttp.Logger,
-		ddhttp.Rest, ddhttp.Recover)
+		//httpsrv.RedisRateLimit(rdb, fn),
+	)
 	srv.AddRoute(httpsrv.Routes(handler)...)
 	srv.Run()
 }

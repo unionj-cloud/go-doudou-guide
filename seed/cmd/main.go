@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"github.com/go-kit/log"
 	"github.com/sirupsen/logrus"
-	"github.com/unionj-cloud/go-doudou/fileutils"
-	"github.com/unionj-cloud/go-doudou/stringutils"
-	ddconfig "github.com/unionj-cloud/go-doudou/svc/config"
-	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
-	"github.com/unionj-cloud/go-doudou/svc/logger"
-	"github.com/unionj-cloud/go-doudou/svc/registry"
+	ddhttp "github.com/unionj-cloud/go-doudou/framework/http"
+	"github.com/unionj-cloud/go-doudou/framework/logger"
+	"github.com/unionj-cloud/go-doudou/framework/registry"
+	"github.com/unionj-cloud/go-doudou/toolkit/fileutils"
+	"github.com/unionj-cloud/go-doudou/toolkit/stringutils"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
@@ -21,12 +20,11 @@ import (
 )
 
 func main() {
-	ddconfig.InitEnv()
 	if logger.CheckDev() {
 		logger.Init(logger.WithWritter(os.Stdout))
 	} else {
 		logger.Init(logger.WithWritter(io.MultiWriter(os.Stdout, &lumberjack.Logger{
-			Filename:   filepath.Join(os.Getenv("LOG_PATH"), fmt.Sprintf("%s.log", ddconfig.GddServiceName.Load())),
+			Filename:   filepath.Join(os.Getenv("LOG_PATH"), fmt.Sprintf("%s.log", "seed")),
 			MaxSize:    5,  // Max megabytes before log is rotated
 			MaxBackups: 10, // Max number of old log files to keep
 			MaxAge:     7,  // Max number of days to retain log files

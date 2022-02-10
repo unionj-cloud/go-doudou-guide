@@ -1,8 +1,8 @@
 package httpsrv
 
 import (
-	"github.com/unionj-cloud/go-doudou/ratelimit/memrate"
-	"github.com/unionj-cloud/go-doudou/ratelimit/redisrate"
+	"github.com/unionj-cloud/go-doudou/framework/ratelimit/memrate"
+	"github.com/unionj-cloud/go-doudou/framework/ratelimit/redisrate"
 	"net/http"
 	"strings"
 )

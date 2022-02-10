@@ -11,9 +11,9 @@ import (
 	"usersvc/vo"
 
 	"github.com/pkg/errors"
-	"github.com/unionj-cloud/go-doudou/cast"
-	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"
-	ddhttp "github.com/unionj-cloud/go-doudou/svc/http"
+	ddhttp "github.com/unionj-cloud/go-doudou/framework/http"
+	"github.com/unionj-cloud/go-doudou/toolkit/cast"
+	v3 "github.com/unionj-cloud/go-doudou/toolkit/openapi/v3"
 )
 
 type UsersvcHandlerImpl struct {

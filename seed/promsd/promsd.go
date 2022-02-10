@@ -6,8 +6,8 @@ import (
 	"github.com/go-kit/log"
 	"github.com/prometheus/prometheus/util/strutil"
 	"github.com/unionj-cloud/cast"
-	"github.com/unionj-cloud/go-doudou/memberlist"
-	"github.com/unionj-cloud/go-doudou/svc/registry"
+	"github.com/unionj-cloud/go-doudou/framework/memberlist"
+	"github.com/unionj-cloud/go-doudou/framework/registry"
 	"net"
 	"time"
 

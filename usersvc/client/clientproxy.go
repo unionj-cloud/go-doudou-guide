@@ -15,8 +15,7 @@ import (
 	"github.com/slok/goresilience/metrics"
 	"github.com/slok/goresilience/retry"
 	"github.com/slok/goresilience/timeout"
-	v3 "github.com/unionj-cloud/go-doudou/openapi/v3"
-	"github.com/unionj-cloud/go-doudou/svc/config"
+	v3 "github.com/unionj-cloud/go-doudou/toolkit/openapi/v3"
 )
 
 type UsersvcClientProxy struct {
@@ -217,12 +216,16 @@ func (receiver *UsersvcClientProxy) GetUser4(ctx context.Context, userId string,
 			pattrs,
 			attrs2...,
 		)
+		if msg != nil {
+			return errors.Wrap(msg, "call GetUser4 fail")
+		}
 		return nil
 	}); _err != nil {
 		// you can implement your fallback logic here
 		if errors.Is(_err, rerrors.ErrCircuitOpen) {
 			receiver.logger.Error(_err)
 		}
+		msg = errors.Wrap(_err, "call GetUser4 fail")
 	}
 	return
 }
@@ -253,11 +256,7 @@ func NewUsersvcClientProxy(client *UsersvcClient, opts ...ProxyOption) *UsersvcC
 
 	if cp.runner == nil {
 		var mid []goresilience.Middleware
-
-		if config.GddManage.Load() == "true" {
-			mid = append(mid, metrics.NewMiddleware("usersvc_client", metrics.NewPrometheusRecorder(prometheus.DefaultRegisterer)))
-		}
-
+		mid = append(mid, metrics.NewMiddleware("usersvc_client", metrics.NewPrometheusRecorder(prometheus.DefaultRegisterer)))
 		mid = append(mid, circuitbreaker.NewMiddleware(circuitbreaker.Config{
 			ErrorPercentThresholdToOpen:        50,
 			MinimumRequestToOpen:               6,

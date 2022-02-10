@@ -10,7 +10,7 @@ import (
 
 func TestUsersvcImpl_DownloadAvatar(t *testing.T) {
 	type fields struct {
-		conf config.Config
+		conf *config.Config
 	}
 	type args struct {
 		ctx    context.Context
@@ -26,7 +26,7 @@ func TestUsersvcImpl_DownloadAvatar(t *testing.T) {
 		{
 			name: "",
 			fields: fields{
-				conf: config.Config{},
+				conf: &config.Config{},
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -41,7 +41,7 @@ func TestUsersvcImpl_DownloadAvatar(t *testing.T) {
 			receiver := &UsersvcImpl{
 				conf: tt.fields.conf,
 			}
-			gotFile, err := receiver.DownloadAvatar(tt.args.ctx, tt.args.userId)
+			_, gotFile, err := receiver.GetDownloadAvatar(tt.args.ctx, tt.args.userId)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DownloadAvatar() error = %v, wantErr %v", err, tt.wantErr)
 				return
