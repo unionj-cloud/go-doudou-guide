@@ -9,7 +9,7 @@ services:
       - LOG_PATH=/var/log
       - GDD_LOG_LEVEL=debug
       - GDD_ENV=test
-      - GDD_MEM_WHITELIST=172.28.1.[!2]
+      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
     volumes:
       - ./prometheus/sd/:/repo/out/
       - ./log:/var/log
@@ -33,6 +33,7 @@ services:
       - LOG_PATH=/var/log
       - GDD_LOG_LEVEL=debug
       - GDD_ENV=test
+      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
     volumes:
       - ./log:/var/log
     expose:
@@ -62,7 +63,7 @@ services:
       - GDD_MODE=micro
       - GDD_LOG_LEVEL=debug
       - GDD_ENV=test
-      - GDD_MEM_WHITELIST=172.28.1.[!2]
+      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
     volumes:
       - ./log:/var/log
     expose:
@@ -91,7 +92,7 @@ services:
       - GDD_MODE=micro
       - GDD_LOG_LEVEL=debug
       - GDD_ENV=test
-      - GDD_MEM_WHITELIST=172.28.1.[!2]
+      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
     volumes:
       - ./log:/var/log
     expose:
@@ -120,7 +121,7 @@ services:
       - GDD_MODE=micro
       - GDD_LOG_LEVEL=debug
       - GDD_ENV=test
-      - GDD_MEM_WHITELIST=172.28.1.[!2]
+      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
     volumes:
       - ./log:/var/log
     expose:
@@ -216,3 +217,8 @@ networks:
       driver: default
       config:
         - subnet: 172.28.0.0/16
+#  testing_net_deny:
+#    ipam:
+#      driver: default
+#      config:
+#        - subnet: 172.16.238.0/24
