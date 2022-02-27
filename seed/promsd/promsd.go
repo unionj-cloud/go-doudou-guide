@@ -2,13 +2,16 @@ package promsd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/go-kit/log"
 	"github.com/prometheus/prometheus/util/strutil"
 	"github.com/unionj-cloud/cast"
 	"github.com/unionj-cloud/go-doudou/framework/memberlist"
 	"github.com/unionj-cloud/go-doudou/framework/registry"
+	"io/ioutil"
 	"net"
+	"os"
 	"time"
 
 	"github.com/go-kit/log/level"
@@ -31,6 +34,12 @@ var (
 type discovery struct {
 	refreshInterval time.Duration
 	logger          log.Logger
+	sdFile          string
+}
+
+type customSD struct {
+	Targets []string          `json:"targets"`
+	Labels  map[string]string `json:"labels"`
 }
 
 func (d *discovery) parseServiceNodes(nodes []*memberlist.Node) ([]*targetgroup.Group, error) {
@@ -64,6 +73,31 @@ func (d *discovery) parseServiceNodes(nodes []*memberlist.Node) ([]*targetgroup.
 		}
 		groups = append(groups, tgroup)
 	}
+
+	groupMap := make(map[string]*targetgroup.Group)
+	for _, item := range groups {
+		groupMap[item.Source] = item
+	}
+
+	f, err := os.Open(d.sdFile)
+	if err != nil {
+		return nil, err
+	}
+	old, err := ioutil.ReadAll(f)
+	if err != nil {
+		return nil, err
+	}
+	var sd []customSD
+	_ = json.Unmarshal(old, &sd)
+
+	for _, item := range sd {
+		source := item.Labels[hostnameLabel]
+		if _, exists := groupMap[source]; !exists {
+			groups = append(groups, &targetgroup.Group{
+				Source: source,
+			})
+		}
+	}
 	return groups, nil
 }
 
@@ -91,10 +125,11 @@ func (d *discovery) Run(ctx context.Context, ch chan<- []*targetgroup.Group) {
 	}
 }
 
-func NewDiscovery(interval time.Duration, logger log.Logger) (*discovery, error) {
+func NewDiscovery(interval time.Duration, logger log.Logger, sdFile string) (*discovery, error) {
 	cd := &discovery{
 		refreshInterval: interval,
 		logger:          logger,
+		sdFile:          sdFile,
 	}
 	return cd, nil
 }

@@ -31,7 +31,13 @@ func main() {
 	kitLogger := log.NewSyncLogger(log.NewLogfmtLogger(os.Stdout))
 	kitLogger = log.With(kitLogger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
 
-	disc, err := promsd.NewDiscovery(interval, kitLogger)
+	out := os.Getenv("PROM_SD_OUT")
+	if stringutils.IsNotEmpty(out) {
+		_ = fileutils.CreateDirectory(out)
+	}
+	sdFile := filepath.Join(out, "go-doudou.json")
+
+	disc, err := promsd.NewDiscovery(interval, kitLogger, sdFile)
 	if err != nil {
 		panic(err)
 	}
@@ -39,12 +45,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	out := os.Getenv("PROM_SD_OUT")
-	if stringutils.IsNotEmpty(out) {
-		_ = fileutils.CreateDirectory(out)
-	}
-
-	sdAdapter := adapter.NewAdapter(ctx, filepath.Join(out, "go-doudou.json"), "go-doudou", disc, kitLogger)
+	sdAdapter := adapter.NewAdapter(ctx, sdFile, "go-doudou", disc, kitLogger)
 	sdAdapter.Run()
 
 	srv := ddhttp.NewDefaultHttpSrv()
