@@ -23,6 +23,8 @@ ENTRYPOINT ["/repo/api"]
 
 FROM ubuntu/prometheus:latest
 
+RUN apt-get update; apt-get -y install curl
+
 ENV TZ="Asia/Shanghai"
 ENV PROM_SD_OUT=/etc/prometheus/sd
 

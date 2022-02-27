@@ -10,7 +10,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/unionj-cloud/cast v1.3.2
 	github.com/unionj-cloud/go-doudou v1.0.0-beta1
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 )
 
-replace github.com/unionj-cloud/go-doudou v1.0.0-beta1 => /Users/wubin1989/workspace/cloud/go-doudou
+//replace github.com/unionj-cloud/go-doudou v1.0.0-beta1 => /Users/wubin1989/workspace/cloud/go-doudou
