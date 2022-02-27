@@ -44,7 +44,7 @@ func main() {
 		_ = fileutils.CreateDirectory(out)
 	}
 
-	sdAdapter := adapter.NewAdapter(ctx, filepath.Join(out, "godoudouguide_sd.json"), "godoudouguideSD", disc, kitLogger)
+	sdAdapter := adapter.NewAdapter(ctx, filepath.Join(out, "go-doudou.json"), "go-doudou", disc, kitLogger)
 	sdAdapter.Run()
 
 	srv := ddhttp.NewDefaultHttpSrv()
