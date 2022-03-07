@@ -16,8 +16,8 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/slok/goresilience v0.2.0
-	github.com/unionj-cloud/go-doudou v1.0.0-beta1
+	github.com/unionj-cloud/go-doudou v1.0.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
-replace github.com/unionj-cloud/go-doudou v1.0.0-beta1 => /Users/wubin1989/workspace/cloud/go-doudou
+replace github.com/unionj-cloud/go-doudou v1.0.0 => /Users/wubin1989/workspace/cloud/go-doudou
