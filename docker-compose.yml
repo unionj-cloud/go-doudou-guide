@@ -4,212 +4,217 @@ services:
   seed:
     container_name: seed
     hostname: seed
-    image: seed:latest
+    image: wubin1989/go-doudou-prometheus-sd:v1.0.0
     environment:
-      - LOG_PATH=/var/log
-      - GDD_LOG_LEVEL=debug
-      - GDD_ENV=test
-      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
+      - GDD_SERVICE_NAME=seed
+      - PROM_REFRESH_INTERVAL=15s
+      - GDD_MEM_HOST=localhost
+#      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
     volumes:
-      - ./prometheus/sd/:/repo/out/
-      - ./log:/var/log
-    expose:
-      - "56200"
+      - ./prometheus/:/etc/prometheus/
     ports:
-      - "56200:56200"
+      - "9090:9090"
+      - "7946:7946"
+      - "7946:7946/udp"
+    restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9090" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     networks:
       testing_net:
         ipv4_address: 172.28.1.1
 
-  ordersvc:
-    container_name: ordersvc
-    hostname: ordersvc
-    image: ordersvc:latest
-    environment:
-      - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
-      - GDD_MEM_SEED=seed:56199
-      - JAEGER_AGENT_HOST=jaeger
-      - JAEGER_AGENT_PORT=6831
-      - LOG_PATH=/var/log
-      - GDD_LOG_LEVEL=debug
-      - GDD_ENV=test
-      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
-    volumes:
-      - ./log:/var/log
-    expose:
-      - "6062"
-    ports:
-      - "6062:6062"
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.2
-    depends_on:
-      - seed
-      - usersvc
-      - jaeger
-
-  usersvc:
-    container_name: usersvc
-    hostname: usersvc
-    image: usersvc:latest
-    environment:
-      - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
-      - GDD_MEM_SEED=seed:56199
-      - GDD_MEM_WEIGHT=5
-      - GDD_MEM_NAME=
-      - JAEGER_AGENT_HOST=jaeger
-      - JAEGER_AGENT_PORT=6831
-      - LOG_PATH=/var/log
-      - GDD_MODE=micro
-      - GDD_LOG_LEVEL=debug
-      - GDD_ENV=test
-      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
-    volumes:
-      - ./log:/var/log
-    expose:
-      - "6061"
-    ports:
-      - "6061:6061"
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.3
-    depends_on:
-      - seed
-      - jaeger
-
-  usersvc01:
-    container_name: usersvc01
-    hostname: usersvc01
-    image: usersvc:latest
-    environment:
-      - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
-      - GDD_MEM_SEED=seed:56199
-      - GDD_MEM_WEIGHT=1
-      - GDD_MEM_NAME=
-      - JAEGER_AGENT_HOST=jaeger
-      - JAEGER_AGENT_PORT=6831
-      - LOG_PATH=/var/log
-      - GDD_MODE=micro
-      - GDD_LOG_LEVEL=debug
-      - GDD_ENV=test
-      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
-    volumes:
-      - ./log:/var/log
-    expose:
-      - "6061"
-    ports:
-      - "6063:6061"
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.4
-    depends_on:
-      - seed
-      - jaeger
-
-  usersvc02:
-    container_name: usersvc02
-    hostname: usersvc02
-    image: usersvc:latest
-    environment:
-      - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
-      - GDD_MEM_SEED=seed:56199
-      - GDD_MEM_WEIGHT=1
-      - GDD_MEM_NAME=
-      - JAEGER_AGENT_HOST=jaeger
-      - JAEGER_AGENT_PORT=6831
-      - LOG_PATH=/var/log
-      - GDD_MODE=micro
-      - GDD_LOG_LEVEL=debug
-      - GDD_ENV=test
-      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
-    volumes:
-      - ./log:/var/log
-    expose:
-      - "6061"
-    ports:
-      - "6064:6061"
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.5
-    depends_on:
-      - seed
-      - jaeger
-
-  jaeger:
-    container_name: jaeger
-    hostname: jaeger
-    image: jaegertracing/all-in-one:latest
-    ports:
-      - "6831:6831/udp"
-      - "16686:16686"
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.6
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    volumes:
-      - ./prometheus/:/etc/prometheus/
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-    ports:
-      - 9090:9090
-    restart: always
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.7
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
-    environment:
-      - GF_AUTH_DISABLE_LOGIN_FORM=false
-      - GF_AUTH_ANONYMOUS_ENABLED=false
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-    ports:
-      - 3000:3000
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.8
-
-  elasticsearch:
-    container_name: elasticsearch
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.2.0"
-    environment:
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      - "discovery.type=single-node"
-    ports:
-      - "9200:9200"
-    volumes:
-      - ./esdata:/usr/share/elasticsearch/data
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.9
-
-  kibana:
-    container_name: kibana
-    image: "docker.elastic.co/kibana/kibana:7.2.0"
-    ports:
-      - "5601:5601"
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.10
-
-  filebeat:
-    container_name: filebeat
-    image: "docker.elastic.co/beats/filebeat:7.2.0"
-    volumes:
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - ./log:/var/log
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.11
+#  ordersvc:
+#    container_name: ordersvc
+#    hostname: ordersvc
+#    image: ordersvc:latest
+#    environment:
+#      - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
+#      - GDD_MEM_SEED=seed:56199
+#      - JAEGER_AGENT_HOST=jaeger
+#      - JAEGER_AGENT_PORT=6831
+#      - LOG_PATH=/var/log
+#      - GDD_LOG_LEVEL=debug
+#      - GDD_ENV=test
+#      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
+#    volumes:
+#      - ./log:/var/log
+#    expose:
+#      - "6062"
+#    ports:
+#      - "6062:6062"
+#    networks:
+#      testing_net:
+#        ipv4_address: 172.28.1.2
+#    depends_on:
+#      - seed
+#      - usersvc
+#      - jaeger
+#
+#  usersvc:
+#    container_name: usersvc
+#    hostname: usersvc
+#    image: usersvc:latest
+#    environment:
+#      - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
+#      - GDD_MEM_SEED=seed:56199
+#      - GDD_MEM_WEIGHT=5
+#      - GDD_MEM_NAME=
+#      - JAEGER_AGENT_HOST=jaeger
+#      - JAEGER_AGENT_PORT=6831
+#      - LOG_PATH=/var/log
+#      - GDD_MODE=micro
+#      - GDD_LOG_LEVEL=debug
+#      - GDD_ENV=test
+#      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
+#    volumes:
+#      - ./log:/var/log
+#    expose:
+#      - "6061"
+#    ports:
+#      - "6061:6061"
+#    networks:
+#      testing_net:
+#        ipv4_address: 172.28.1.3
+#    depends_on:
+#      - seed
+#      - jaeger
+#
+#  usersvc01:
+#    container_name: usersvc01
+#    hostname: usersvc01
+#    image: usersvc:latest
+#    environment:
+#      - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
+#      - GDD_MEM_SEED=seed:56199
+#      - GDD_MEM_WEIGHT=1
+#      - GDD_MEM_NAME=
+#      - JAEGER_AGENT_HOST=jaeger
+#      - JAEGER_AGENT_PORT=6831
+#      - LOG_PATH=/var/log
+#      - GDD_MODE=micro
+#      - GDD_LOG_LEVEL=debug
+#      - GDD_ENV=test
+#      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
+#    volumes:
+#      - ./log:/var/log
+#    expose:
+#      - "6061"
+#    ports:
+#      - "6063:6061"
+#    networks:
+#      testing_net:
+#        ipv4_address: 172.28.1.4
+#    depends_on:
+#      - seed
+#      - jaeger
+#
+#  usersvc02:
+#    container_name: usersvc02
+#    hostname: usersvc02
+#    image: usersvc:latest
+#    environment:
+#      - DB_HOST=${DOCKER_GATEWAY_HOST:-host.docker.internal}
+#      - GDD_MEM_SEED=seed:56199
+#      - GDD_MEM_WEIGHT=1
+#      - GDD_MEM_NAME=
+#      - JAEGER_AGENT_HOST=jaeger
+#      - JAEGER_AGENT_PORT=6831
+#      - LOG_PATH=/var/log
+#      - GDD_MODE=micro
+#      - GDD_LOG_LEVEL=debug
+#      - GDD_ENV=test
+#      - GDD_MEM_CIDRS_ALLOWED=172.28.0.0/16
+#    volumes:
+#      - ./log:/var/log
+#    expose:
+#      - "6061"
+#    ports:
+#      - "6064:6061"
+#    networks:
+#      testing_net:
+#        ipv4_address: 172.28.1.5
+#    depends_on:
+#      - seed
+#      - jaeger
+#
+#  jaeger:
+#    container_name: jaeger
+#    hostname: jaeger
+#    image: jaegertracing/all-in-one:latest
+#    ports:
+#      - "6831:6831/udp"
+#      - "16686:16686"
+#    networks:
+#      testing_net:
+#        ipv4_address: 172.28.1.6
+#
+#  prometheus:
+#    image: prom/prometheus:latest
+#    container_name: prometheus
+#    volumes:
+#      - ./prometheus/:/etc/prometheus/
+#    command:
+#      - '--config.file=/etc/prometheus/prometheus.yml'
+#      - '--storage.tsdb.path=/prometheus'
+#      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+#      - '--web.console.templates=/usr/share/prometheus/consoles'
+#    ports:
+#      - 9090:9090
+#    restart: always
+#    networks:
+#      testing_net:
+#        ipv4_address: 172.28.1.7
+#
+#  grafana:
+#    image: grafana/grafana:latest
+#    container_name: grafana
+#    volumes:
+#      - ./grafana/provisioning:/etc/grafana/provisioning
+#    environment:
+#      - GF_AUTH_DISABLE_LOGIN_FORM=false
+#      - GF_AUTH_ANONYMOUS_ENABLED=false
+#      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+#    ports:
+#      - 3000:3000
+#    networks:
+#      testing_net:
+#        ipv4_address: 172.28.1.8
+#
+#  elasticsearch:
+#    container_name: elasticsearch
+#    image: "docker.elastic.co/elasticsearch/elasticsearch:7.2.0"
+#    environment:
+#      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+#      - "discovery.type=single-node"
+#    ports:
+#      - "9200:9200"
+#    volumes:
+#      - ./esdata:/usr/share/elasticsearch/data
+#    networks:
+#      testing_net:
+#        ipv4_address: 172.28.1.9
+#
+#  kibana:
+#    container_name: kibana
+#    image: "docker.elastic.co/kibana/kibana:7.2.0"
+#    ports:
+#      - "5601:5601"
+#    networks:
+#      testing_net:
+#        ipv4_address: 172.28.1.10
+#
+#  filebeat:
+#    container_name: filebeat
+#    image: "docker.elastic.co/beats/filebeat:7.2.0"
+#    volumes:
+#      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+#      - ./log:/var/log
+#    networks:
+#      testing_net:
+#        ipv4_address: 172.28.1.11
 
 networks:
   testing_net:

@@ -1,0 +1,38 @@
+[
+    {
+        "targets": [
+            "localhost:6060"
+        ],
+        "labels": {
+            "base_url": "http://localhost:6060",
+            "build_time": "2022-03-07 16:38:13",
+            "build_user": "",
+            "go_ver": "go1.16.12",
+            "godoudou_ver": "v1.0.0",
+            "hostname": "seed",
+            "service_id": "seed"
+        }
+    },
+    {
+        "targets": [],
+        "labels": {}
+    },
+    {
+        "targets": [],
+        "labels": {}
+    },
+    {
+        "targets": [
+            "192.168.101.11:6062"
+        ],
+        "labels": {
+            "base_url": "http://192.168.101.11:6062",
+            "build_time": "",
+            "build_user": "",
+            "go_ver": "go1.17.7",
+            "godoudou_ver": "",
+            "hostname": "ordersvc",
+            "service_id": "ordersvc"
+        }
+    }
+]
