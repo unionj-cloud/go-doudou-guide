@@ -3,6 +3,7 @@ module usersvc
 go 1.15
 
 require (
+	github.com/brianvoe/gofakeit/v6 v6.15.0
 	github.com/go-resty/resty/v2 v2.6.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/handlers v1.5.1 // indirect
@@ -16,8 +17,8 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/slok/goresilience v0.2.0
-	github.com/unionj-cloud/go-doudou v1.0.0
+	github.com/unionj-cloud/go-doudou v1.0.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
-replace github.com/unionj-cloud/go-doudou v1.0.0 => /Users/wubin1989/workspace/cloud/go-doudou
+replace github.com/unionj-cloud/go-doudou v1.0.1 => /Users/wubin1989/workspace/cloud/go-doudou

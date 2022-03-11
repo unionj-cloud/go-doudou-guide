@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/brianvoe/gofakeit/v6"
 	"io"
 	"os"
 	"strings"
@@ -47,41 +48,6 @@ func (receiver *UsersvcImpl) GetDownloadAvatar(ctx context.Context, userId strin
 	mimetype := resp.Header().Get("Content-Type")
 	f, err := os.Open(os.TempDir() + "/" + fileName)
 	return mimetype, f, err
-}
-
-func (receiver *UsersvcImpl) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (receiver *UsersvcImpl) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (receiver *UsersvcImpl) UploadAvatar(ctx context.Context, models []v3.FileModel, s string) (int, string, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (receiver *UsersvcImpl) UploadAvatar2(ctx context.Context, models []v3.FileModel, s string, model *v3.FileModel, model2 *v3.FileModel) (int, string, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (receiver *UsersvcImpl) GetUser2(ctx context.Context, userId string, photo *string) (code int, data *string, msg error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (receiver *UsersvcImpl) PageUsers2(ctx context.Context, query *vo.PageQuery) (code int, data vo.PageRet, msg error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (receiver *UsersvcImpl) GetUser3(ctx context.Context, userId string, photo *string, attrs []int, pattrs *[]int) (code int, data *string, msg error) {
-	//TODO implement me
-	panic("implement me")
 }
 
 func saveFile(fm *v3.FileModel) error {
@@ -164,4 +130,61 @@ func NewUsersvc(conf *config.Config) Usersvc {
 	return &UsersvcImpl{
 		conf,
 	}
+}
+
+func (receiver *UsersvcImpl) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
+	var _result struct {
+		Code int
+		Data string
+	}
+	_ = gofakeit.Struct(&_result)
+	return _result.Code, _result.Data, nil
+}
+func (receiver *UsersvcImpl) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
+	var _result struct {
+		Code int
+		Data string
+	}
+	_ = gofakeit.Struct(&_result)
+	return _result.Code, _result.Data, nil
+}
+func (receiver *UsersvcImpl) UploadAvatar(pc context.Context, pf []v3.FileModel, ps string) (ri int, rs string, re error) {
+	var _result struct {
+		Ri int
+		Rs string
+	}
+	_ = gofakeit.Struct(&_result)
+	return _result.Ri, _result.Rs, nil
+}
+func (receiver *UsersvcImpl) UploadAvatar2(pc context.Context, pf []v3.FileModel, ps string, pf2 *v3.FileModel, pf3 *v3.FileModel) (ri int, rs string, re error) {
+	var _result struct {
+		Ri int
+		Rs string
+	}
+	_ = gofakeit.Struct(&_result)
+	return _result.Ri, _result.Rs, nil
+}
+func (receiver *UsersvcImpl) GetUser2(ctx context.Context, userId string, photo *string) (code int, data *string, msg error) {
+	var _result struct {
+		Code int
+		Data *string
+	}
+	_ = gofakeit.Struct(&_result)
+	return _result.Code, _result.Data, nil
+}
+func (receiver *UsersvcImpl) PageUsers2(ctx context.Context, query *vo.PageQuery) (code int, data vo.PageRet, msg error) {
+	var _result struct {
+		Code int
+		Data vo.PageRet
+	}
+	_ = gofakeit.Struct(&_result)
+	return _result.Code, _result.Data, nil
+}
+func (receiver *UsersvcImpl) GetUser3(ctx context.Context, userId string, photo *string, attrs []int, pattrs *[]int) (code int, data *string, msg error) {
+	var _result struct {
+		Code int
+		Data *string
+	}
+	_ = gofakeit.Struct(&_result)
+	return _result.Code, _result.Data, nil
 }

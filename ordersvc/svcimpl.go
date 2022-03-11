@@ -4,7 +4,7 @@ import (
 	"context"
 	"ordersvc/config"
 	"ordersvc/vo"
-	service "usersvc"
+	userclient "usersvc/client"
 	vo1 "usersvc/vo"
 
 	"github.com/jmoiron/sqlx"
@@ -12,7 +12,7 @@ import (
 
 type OrdersvcImpl struct {
 	conf          *config.Config
-	usersvcClient service.Usersvc
+	usersvcClient userclient.IUsersvcClient
 }
 
 func (receiver *OrdersvcImpl) GetGreeting(ctx context.Context, hello string) (ret string, err error) {
@@ -29,7 +29,7 @@ func (receiver *OrdersvcImpl) GetHello(ctx context.Context) (ret string, err err
 
 func (receiver *OrdersvcImpl) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
 	var _data vo1.PageRet
-	code, _data, msg = receiver.usersvcClient.PageUsers(ctx, vo1.PageQuery{
+	_, code, _data, msg = receiver.usersvcClient.PageUsers(ctx, nil, vo1.PageQuery{
 		Filter: vo1.PageFilter(query.Filter),
 		Page: vo1.Page{
 			Orders: nil,
@@ -41,7 +41,7 @@ func (receiver *OrdersvcImpl) PageUsers(ctx context.Context, query vo.PageQuery)
 	return
 }
 
-func NewOrdersvc(conf *config.Config, db *sqlx.DB, usersvcClient service.Usersvc) Ordersvc {
+func NewOrdersvc(conf *config.Config, db *sqlx.DB, usersvcClient userclient.IUsersvcClient) Ordersvc {
 	return &OrdersvcImpl{
 		conf,
 		usersvcClient,

@@ -1,21 +1,21 @@
 [
     {
+        "targets": [],
+        "labels": {}
+    },
+    {
         "targets": [
             "localhost:6060"
         ],
         "labels": {
             "base_url": "http://localhost:6060",
-            "build_time": "2022-03-07 16:38:13",
+            "build_time": "2022-03-12T01:01:42+0800",
             "build_user": "",
             "go_ver": "go1.16.12",
-            "godoudou_ver": "v1.0.0",
+            "godoudou_ver": "v1.0.2",
             "hostname": "seed",
             "service_id": "seed"
         }
-    },
-    {
-        "targets": [],
-        "labels": {}
     },
     {
         "targets": [],

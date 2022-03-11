@@ -14,13 +14,12 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/slok/goresilience v0.2.0
-	github.com/unionj-cloud/go-doudou v1.0.0
+	github.com/unionj-cloud/go-doudou v1.0.1
 )
 
 require (
 	github.com/google/go-querystring v1.1.0
 	github.com/gorilla/handlers v1.5.1 // indirect
-	github.com/nacos-group/nacos-sdk-go v1.1.1
 )
 
-replace github.com/unionj-cloud/go-doudou v1.0.0 => /Users/wubin1989/workspace/cloud/go-doudou
+replace github.com/unionj-cloud/go-doudou v1.0.1 => /Users/wubin1989/workspace/cloud/go-doudou

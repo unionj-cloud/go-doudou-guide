@@ -6,6 +6,7 @@ import (
 	"time"
 	"usersvc/vo"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
@@ -24,10 +25,11 @@ type UsersvcClientProxy struct {
 	runner goresilience.Runner
 }
 
-func (receiver *UsersvcClientProxy) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
+func (receiver *UsersvcClientProxy) PageUsers(ctx context.Context, _headers map[string]string, query vo.PageQuery) (_resp *resty.Response, code int, data vo.PageRet, msg error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		_, code, data, msg = receiver.client.PageUsers(
+		_resp, code, data, msg = receiver.client.PageUsers(
 			ctx,
+			_headers,
 			query,
 		)
 		if msg != nil {
@@ -43,10 +45,11 @@ func (receiver *UsersvcClientProxy) PageUsers(ctx context.Context, query vo.Page
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) GetUser(ctx context.Context, userId string, photo string) (code int, data string, msg error) {
+func (receiver *UsersvcClientProxy) GetUser(ctx context.Context, _headers map[string]string, userId string, photo string) (_resp *resty.Response, code int, data string, msg error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		_, code, data, msg = receiver.client.GetUser(
+		_resp, code, data, msg = receiver.client.GetUser(
 			ctx,
+			_headers,
 			userId,
 			photo,
 		)
@@ -63,10 +66,11 @@ func (receiver *UsersvcClientProxy) GetUser(ctx context.Context, userId string, 
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) SignUp(ctx context.Context, username string, password int, actived bool, score float64) (code int, data string, msg error) {
+func (receiver *UsersvcClientProxy) SignUp(ctx context.Context, _headers map[string]string, username string, password int, actived bool, score float64) (_resp *resty.Response, code int, data string, msg error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		_, code, data, msg = receiver.client.SignUp(
+		_resp, code, data, msg = receiver.client.SignUp(
 			ctx,
+			_headers,
 			username,
 			password,
 			actived,
@@ -85,10 +89,11 @@ func (receiver *UsersvcClientProxy) SignUp(ctx context.Context, username string,
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) UploadAvatar(pc context.Context, pf []v3.FileModel, ps string) (ri int, rs string, re error) {
-	if _err := receiver.runner.Run(pc, func(ctx context.Context) error {
-		_, ri, rs, re = receiver.client.UploadAvatar(
-			pc,
+func (receiver *UsersvcClientProxy) UploadAvatar(ctx context.Context, _headers map[string]string, pf []v3.FileModel, ps string) (_resp *resty.Response, ri int, rs string, re error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		_resp, ri, rs, re = receiver.client.UploadAvatar(
+			ctx,
+			_headers,
 			pf,
 			ps,
 		)
@@ -105,10 +110,11 @@ func (receiver *UsersvcClientProxy) UploadAvatar(pc context.Context, pf []v3.Fil
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) UploadAvatar2(pc context.Context, pf []v3.FileModel, ps string, pf2 *v3.FileModel, pf3 *v3.FileModel) (ri int, rs string, re error) {
-	if _err := receiver.runner.Run(pc, func(ctx context.Context) error {
-		_, ri, rs, re = receiver.client.UploadAvatar2(
-			pc,
+func (receiver *UsersvcClientProxy) UploadAvatar2(ctx context.Context, _headers map[string]string, pf []v3.FileModel, ps string, pf2 *v3.FileModel, pf3 *v3.FileModel) (_resp *resty.Response, ri int, rs string, re error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		_resp, ri, rs, re = receiver.client.UploadAvatar2(
+			ctx,
+			_headers,
 			pf,
 			ps,
 			pf2,
@@ -127,10 +133,11 @@ func (receiver *UsersvcClientProxy) UploadAvatar2(pc context.Context, pf []v3.Fi
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) GetDownloadAvatar(ctx context.Context, userId string) (rs string, rf *os.File, re error) {
+func (receiver *UsersvcClientProxy) GetDownloadAvatar(ctx context.Context, _headers map[string]string, userId string) (_resp *resty.Response, rs string, rf *os.File, re error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		_, rs, rf, re = receiver.client.GetDownloadAvatar(
+		_resp, rs, rf, re = receiver.client.GetDownloadAvatar(
 			ctx,
+			_headers,
 			userId,
 		)
 		if re != nil {
@@ -146,10 +153,11 @@ func (receiver *UsersvcClientProxy) GetDownloadAvatar(ctx context.Context, userI
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) GetUser2(ctx context.Context, userId string, photo *string) (code int, data *string, msg error) {
+func (receiver *UsersvcClientProxy) GetUser2(ctx context.Context, _headers map[string]string, userId string, photo *string) (_resp *resty.Response, code int, data *string, msg error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		_, code, data, msg = receiver.client.GetUser2(
+		_resp, code, data, msg = receiver.client.GetUser2(
 			ctx,
+			_headers,
 			userId,
 			photo,
 		)
@@ -166,10 +174,11 @@ func (receiver *UsersvcClientProxy) GetUser2(ctx context.Context, userId string,
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) PageUsers2(ctx context.Context, query *vo.PageQuery) (code int, data vo.PageRet, msg error) {
+func (receiver *UsersvcClientProxy) PageUsers2(ctx context.Context, _headers map[string]string, query *vo.PageQuery) (_resp *resty.Response, code int, data vo.PageRet, msg error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		_, code, data, msg = receiver.client.PageUsers2(
+		_resp, code, data, msg = receiver.client.PageUsers2(
 			ctx,
+			_headers,
 			query,
 		)
 		if msg != nil {
@@ -185,10 +194,11 @@ func (receiver *UsersvcClientProxy) PageUsers2(ctx context.Context, query *vo.Pa
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) GetUser3(ctx context.Context, userId string, photo *string, attrs []int, pattrs *[]int) (code int, data *string, msg error) {
+func (receiver *UsersvcClientProxy) GetUser3(ctx context.Context, _headers map[string]string, userId string, photo *string, attrs []int, pattrs *[]int) (_resp *resty.Response, code int, data *string, msg error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		_, code, data, msg = receiver.client.GetUser3(
+		_resp, code, data, msg = receiver.client.GetUser3(
 			ctx,
+			_headers,
 			userId,
 			photo,
 			attrs,
@@ -207,10 +217,11 @@ func (receiver *UsersvcClientProxy) GetUser3(ctx context.Context, userId string,
 	}
 	return
 }
-func (receiver *UsersvcClientProxy) GetUser4(ctx context.Context, userId string, photo *string, pattrs *[]int, attrs2 ...int) (code int, data *string, msg error) {
+func (receiver *UsersvcClientProxy) GetUser4(ctx context.Context, _headers map[string]string, userId string, photo *string, pattrs *[]int, attrs2 ...int) (_resp *resty.Response, code int, data *string, msg error) {
 	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
-		_, code, data, msg = receiver.client.GetUser4(
+		_resp, code, data, msg = receiver.client.GetUser4(
 			ctx,
+			_headers,
 			userId,
 			photo,
 			pattrs,
