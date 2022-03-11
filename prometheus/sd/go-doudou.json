@@ -22,17 +22,7 @@
         "labels": {}
     },
     {
-        "targets": [
-            "192.168.101.11:6062"
-        ],
-        "labels": {
-            "base_url": "http://192.168.101.11:6062",
-            "build_time": "",
-            "build_user": "",
-            "go_ver": "go1.17.7",
-            "godoudou_ver": "",
-            "hostname": "ordersvc",
-            "service_id": "ordersvc"
-        }
+        "targets": [],
+        "labels": {}
     }
 ]
