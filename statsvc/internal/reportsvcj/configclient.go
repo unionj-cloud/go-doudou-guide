@@ -2,6 +2,7 @@ package reportsvcj
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -13,26 +14,24 @@ import (
 	"github.com/unionj-cloud/go-doudou/framework/registry"
 )
 
-type EchoClient struct {
+type ConfigClient struct {
 	provider registry.IServiceProvider
 	client   *resty.Client
 	rootPath string
 }
 
-func (receiver *EchoClient) SetRootPath(rootPath string) {
+func (receiver *ConfigClient) SetRootPath(rootPath string) {
 	receiver.rootPath = rootPath
 }
 
-func (receiver *EchoClient) SetProvider(provider registry.IServiceProvider) {
+func (receiver *ConfigClient) SetProvider(provider registry.IServiceProvider) {
 	receiver.provider = provider
 }
 
-func (receiver *EchoClient) SetClient(client *resty.Client) {
+func (receiver *ConfigClient) SetClient(client *resty.Client) {
 	receiver.client = client
 }
-func (receiver *EchoClient) GetEchoString(ctx context.Context, _headers map[string]string,
-	// required
-	string string) (ret string, _resp *resty.Response, err error) {
+func (receiver *ConfigClient) GetConfigGet(ctx context.Context, _headers map[string]string) (ret bool, _resp *resty.Response, err error) {
 	var _err error
 
 	_req := receiver.client.R()
@@ -40,9 +39,8 @@ func (receiver *EchoClient) GetEchoString(ctx context.Context, _headers map[stri
 	if len(_headers) > 0 {
 		_req.SetHeaders(_headers)
 	}
-	_req.SetPathParam("string", fmt.Sprintf("%v", string))
 
-	_resp, _err = _req.Get("/echo/{string}")
+	_resp, _err = _req.Get("/config/get")
 	if _err != nil {
 		err = errors.Wrap(_err, "")
 		return
@@ -51,15 +49,18 @@ func (receiver *EchoClient) GetEchoString(ctx context.Context, _headers map[stri
 		err = errors.New(_resp.String())
 		return
 	}
-	ret = _resp.String()
+	if _err = json.Unmarshal(_resp.Body(), &ret); _err != nil {
+		err = errors.Wrap(_err, "")
+		return
+	}
 	return
 }
 
-func NewEcho(opts ...ddhttp.DdClientOption) *EchoClient {
+func NewConfig(opts ...ddhttp.DdClientOption) *ConfigClient {
 	defaultProvider := ddhttp.NewServiceProvider("REPORT_SVC_J")
 	defaultClient := ddhttp.NewClient()
 
-	svcClient := &EchoClient{
+	svcClient := &ConfigClient{
 		provider: defaultProvider,
 		client:   defaultClient,
 	}

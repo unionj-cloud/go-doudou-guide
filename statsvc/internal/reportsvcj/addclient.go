@@ -2,10 +2,12 @@ package reportsvcj
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/go-resty/resty/v2"
+	_querystring "github.com/google/go-querystring/query"
 	"github.com/opentracing-contrib/go-stdlib/nethttp"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
@@ -13,26 +15,31 @@ import (
 	"github.com/unionj-cloud/go-doudou/framework/registry"
 )
 
-type EchoClient struct {
+type AddClient struct {
 	provider registry.IServiceProvider
 	client   *resty.Client
 	rootPath string
 }
 
-func (receiver *EchoClient) SetRootPath(rootPath string) {
+func (receiver *AddClient) SetRootPath(rootPath string) {
 	receiver.rootPath = rootPath
 }
 
-func (receiver *EchoClient) SetProvider(provider registry.IServiceProvider) {
+func (receiver *AddClient) SetProvider(provider registry.IServiceProvider) {
 	receiver.provider = provider
 }
 
-func (receiver *EchoClient) SetClient(client *resty.Client) {
+func (receiver *AddClient) SetClient(client *resty.Client) {
 	receiver.client = client
 }
-func (receiver *EchoClient) GetEchoString(ctx context.Context, _headers map[string]string,
-	// required
-	string string) (ret string, _resp *resty.Response, err error) {
+func (receiver *AddClient) GetAdd(ctx context.Context, _headers map[string]string,
+	queryParams struct {
+		// required
+		X int `json:"x,omitempty" url:"x"`
+		// required
+		Y int `json:"y,omitempty" url:"y"`
+	}) (ret struct {
+}, _resp *resty.Response, err error) {
 	var _err error
 
 	_req := receiver.client.R()
@@ -40,9 +47,10 @@ func (receiver *EchoClient) GetEchoString(ctx context.Context, _headers map[stri
 	if len(_headers) > 0 {
 		_req.SetHeaders(_headers)
 	}
-	_req.SetPathParam("string", fmt.Sprintf("%v", string))
+	_queryParams, _ := _querystring.Values(queryParams)
+	_req.SetQueryParamsFromValues(_queryParams)
 
-	_resp, _err = _req.Get("/echo/{string}")
+	_resp, _err = _req.Get("/add")
 	if _err != nil {
 		err = errors.Wrap(_err, "")
 		return
@@ -51,15 +59,18 @@ func (receiver *EchoClient) GetEchoString(ctx context.Context, _headers map[stri
 		err = errors.New(_resp.String())
 		return
 	}
-	ret = _resp.String()
+	if _err = json.Unmarshal(_resp.Body(), &ret); _err != nil {
+		err = errors.Wrap(_err, "")
+		return
+	}
 	return
 }
 
-func NewEcho(opts ...ddhttp.DdClientOption) *EchoClient {
+func NewAdd(opts ...ddhttp.DdClientOption) *AddClient {
 	defaultProvider := ddhttp.NewServiceProvider("REPORT_SVC_J")
 	defaultClient := ddhttp.NewClient()
 
-	svcClient := &EchoClient{
+	svcClient := &AddClient{
 		provider: defaultProvider,
 		client:   defaultClient,
 	}
