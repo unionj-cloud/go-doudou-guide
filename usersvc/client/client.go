@@ -432,6 +432,40 @@ func (receiver *UsersvcClient) GetUser4(ctx context.Context, _headers map[string
 	}
 	return _resp, _result.Code, _result.Data, nil
 }
+func (receiver *UsersvcClient) PageUsers3(ctx context.Context, _headers map[string]string, query vo.PageQuery1) (_resp *resty.Response, code int, data vo.PageRet, msg error) {
+	var _err error
+	_urlValues := url.Values{}
+	_req := receiver.client.R()
+	if len(_headers) > 0 {
+		_req.SetHeaders(_headers)
+	}
+	_req.SetContext(ctx)
+	_req.SetBody(query)
+	_path := "/page/users/3"
+	if _req.Body != nil {
+		_req.SetQueryParamsFromValues(_urlValues)
+	} else {
+		_req.SetFormDataFromValues(_urlValues)
+	}
+	_resp, _err = _req.Post(_path)
+	if _err != nil {
+		msg = errors.Wrap(_err, "error")
+		return
+	}
+	if _resp.IsError() {
+		msg = errors.New(_resp.String())
+		return
+	}
+	var _result struct {
+		Code int        `json:"code"`
+		Data vo.PageRet `json:"data"`
+	}
+	if _err = json.Unmarshal(_resp.Body(), &_result); _err != nil {
+		msg = errors.Wrap(_err, "error")
+		return
+	}
+	return _resp, _result.Code, _result.Data, nil
+}
 
 func NewUsersvcClient(opts ...ddhttp.DdClientOption) *UsersvcClient {
 	defaultProvider := ddhttp.NewServiceProvider("USERSVC")

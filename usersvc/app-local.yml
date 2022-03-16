@@ -1,0 +1,9 @@
+gdd:
+  mode: mono
+  port: 8080
+  log:
+    req:
+      enable: true
+
+log:
+  path: "log"

@@ -17,6 +17,7 @@ type UsersvcHandler interface {
 	PageUsers2(w http.ResponseWriter, r *http.Request)
 	GetUser3(w http.ResponseWriter, r *http.Request)
 	GetUser4(w http.ResponseWriter, r *http.Request)
+	PageUsers3(w http.ResponseWriter, r *http.Request)
 }
 
 func Routes(handler UsersvcHandler) []ddmodel.Route {
@@ -80,6 +81,12 @@ func Routes(handler UsersvcHandler) []ddmodel.Route {
 			"GET",
 			"/user/4",
 			handler.GetUser4,
+		},
+		{
+			"PageUsers3",
+			"POST",
+			"/page/users/3",
+			handler.PageUsers3,
 		},
 	}
 }

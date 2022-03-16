@@ -698,3 +698,47 @@ func NewUsersvcHandler(usersvc service.Usersvc) UsersvcHandler {
 		usersvc,
 	}
 }
+
+func (receiver *UsersvcHandlerImpl) PageUsers3(_writer http.ResponseWriter, _req *http.Request) {
+	var (
+		ctx   context.Context
+		query vo.PageQuery1
+		code  int
+		data  vo.PageRet
+		msg   error
+	)
+	ctx = _req.Context()
+	if _req.Body == nil {
+		http.Error(_writer, "missing request body", http.StatusBadRequest)
+		return
+	} else {
+		if _err := json.NewDecoder(_req.Body).Decode(&query); _err != nil {
+			http.Error(_writer, _err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+	code, data, msg = receiver.usersvc.PageUsers3(
+		ctx,
+		query,
+	)
+	if msg != nil {
+		if errors.Is(msg, context.Canceled) {
+			http.Error(_writer, msg.Error(), http.StatusBadRequest)
+		} else if _err, ok := msg.(*ddhttp.BizError); ok {
+			http.Error(_writer, _err.Error(), _err.StatusCode)
+		} else {
+			http.Error(_writer, msg.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if _err := json.NewEncoder(_writer).Encode(struct {
+		Code int        `json:"code"`
+		Data vo.PageRet `json:"data"`
+	}{
+		Code: code,
+		Data: data,
+	}); _err != nil {
+		http.Error(_writer, _err.Error(), http.StatusInternalServerError)
+		return
+	}
+}

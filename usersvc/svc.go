@@ -84,4 +84,16 @@ type Usersvc interface {
 		// user id
 		// comments above input and output basic type parameters will display on online document
 		userId string, photo *string, pattrs *[]int, attrs2 ...int) (code int, data *string, msg error)
+
+	// PageUsers3 demonstrate how to define POST and Content-Type as application/json api
+	PageUsers3(ctx context.Context,
+		// comments above input and output struct type parameters in vo package will display on online document
+		// not comments here
+		query vo.PageQuery1) (
+		// it indicates there is an error if code is not 0
+		code int,
+		// page data
+		data vo.PageRet,
+		// error message
+		msg error)
 }

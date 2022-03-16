@@ -288,3 +288,24 @@ func NewUsersvcClientProxy(client *UsersvcClient, opts ...ProxyOption) *UsersvcC
 
 	return cp
 }
+
+func (receiver *UsersvcClientProxy) PageUsers3(ctx context.Context, _headers map[string]string, query vo.PageQuery1) (_resp *resty.Response, code int, data vo.PageRet, msg error) {
+	if _err := receiver.runner.Run(ctx, func(ctx context.Context) error {
+		_resp, code, data, msg = receiver.client.PageUsers3(
+			ctx,
+			_headers,
+			query,
+		)
+		if msg != nil {
+			return errors.Wrap(msg, "call PageUsers3 fail")
+		}
+		return nil
+	}); _err != nil {
+		// you can implement your fallback logic here
+		if errors.Is(_err, rerrors.ErrCircuitOpen) {
+			receiver.logger.Error(_err)
+		}
+		msg = errors.Wrap(_err, "call PageUsers3 fail")
+	}
+	return
+}

@@ -31,6 +31,14 @@ type PageQuery struct {
 	Page   Page       `json:"page,omitempty"`
 }
 
+type IPage interface {
+}
+
+// 分页筛选条件
+type PageQuery1 struct {
+	Page IPage `json:"page"`
+}
+
 // PageRet pagination query result
 type PageRet struct {
 	Items    interface{} `json:"items,omitempty"`

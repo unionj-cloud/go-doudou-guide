@@ -2,13 +2,14 @@ package service
 
 import (
 	"context"
-	"github.com/brianvoe/gofakeit/v6"
 	"io"
 	"os"
 	"strings"
 	"time"
 	"usersvc/config"
 	"usersvc/vo"
+
+	"github.com/brianvoe/gofakeit/v6"
 
 	ddhttp "github.com/unionj-cloud/go-doudou/framework/http"
 
@@ -184,6 +185,15 @@ func (receiver *UsersvcImpl) GetUser3(ctx context.Context, userId string, photo 
 	var _result struct {
 		Code int
 		Data *string
+	}
+	_ = gofakeit.Struct(&_result)
+	return _result.Code, _result.Data, nil
+}
+
+func (receiver *UsersvcImpl) PageUsers3(ctx context.Context, query vo.PageQuery1) (code int, data vo.PageRet, msg error) {
+	var _result struct {
+		Code int
+		Data vo.PageRet
 	}
 	_ = gofakeit.Struct(&_result)
 	return _result.Code, _result.Data, nil

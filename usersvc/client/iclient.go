@@ -20,4 +20,5 @@ type IUsersvcClient interface {
 	PageUsers2(ctx context.Context, _headers map[string]string, query *vo.PageQuery) (_resp *resty.Response, code int, data vo.PageRet, msg error)
 	GetUser3(ctx context.Context, _headers map[string]string, userId string, photo *string, attrs []int, pattrs *[]int) (_resp *resty.Response, code int, data *string, msg error)
 	GetUser4(ctx context.Context, _headers map[string]string, userId string, photo *string, pattrs *[]int, attrs2 ...int) (_resp *resty.Response, code int, data *string, msg error)
+	PageUsers3(ctx context.Context, _headers map[string]string, query vo.PageQuery1) (_resp *resty.Response, code int, data vo.PageRet, msg error)
 }
