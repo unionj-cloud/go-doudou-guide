@@ -16,3 +16,5 @@ require (
 )
 
 replace usersvc v0.0.0 => /Users/wubin1989/workspace/cloud/go-doudou-guide/usersvc
+
+replace github.com/unionj-cloud/go-doudou v1.0.2 => /Users/wubin1989/workspace/cloud/go-doudou

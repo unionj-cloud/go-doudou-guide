@@ -1,6 +1,6 @@
 gdd:
-  mode: mono
-  port: 8080
+#  mode: mono
+  port: 6080
   log:
     req:
       enable: true

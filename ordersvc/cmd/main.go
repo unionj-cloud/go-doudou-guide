@@ -43,8 +43,8 @@ func main() {
 	defer closer.Close()
 	opentracing.SetGlobalTracer(tracer)
 
-	usersvcProvider := ddhttp.NewSmoothWeightedRoundRobinProvider("usersvc")
-	usersvcClient := client.NewUsersvcClient(ddhttp.WithProvider(usersvcProvider))
+	usersvcProvider := ddhttp.NewNacosWRRServiceProvider("usersvc")
+	usersvcClient := client.NewUsersvcClient(ddhttp.WithProvider(usersvcProvider), ddhttp.WithRootPath("/api"))
 	usersvcClientProxy := client.NewUsersvcClientProxy(usersvcClient)
 
 	svc := service.NewOrdersvc(conf, nil, usersvcClientProxy)

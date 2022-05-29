@@ -4,6 +4,10 @@
         "labels": {}
     },
     {
+        "targets": [],
+        "labels": {}
+    },
+    {
         "targets": [
             "localhost:6060"
         ],
