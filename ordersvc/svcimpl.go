@@ -2,12 +2,10 @@ package service
 
 import (
 	"context"
+	"github.com/jmoiron/sqlx"
 	"ordersvc/config"
 	"ordersvc/vo"
 	userclient "usersvc/client"
-	vo1 "usersvc/vo"
-
-	"github.com/jmoiron/sqlx"
 )
 
 type OrdersvcImpl struct {
@@ -28,16 +26,16 @@ func (receiver *OrdersvcImpl) GetHello(ctx context.Context) (ret string, err err
 }
 
 func (receiver *OrdersvcImpl) PageUsers(ctx context.Context, query vo.PageQuery) (code int, data vo.PageRet, msg error) {
-	var _data vo1.PageRet
-	_, code, _data, msg = receiver.usersvcClient.PageUsers(ctx, nil, vo1.PageQuery{
-		Filter: vo1.PageFilter(query.Filter),
-		Page: vo1.Page{
-			Orders: nil,
-			PageNo: query.Page.PageNo,
-			Size:   query.Page.Size,
-		},
-	})
-	data = vo.PageRet(_data)
+	//var _data vo1.PageRet
+	//_, code, _data, msg = receiver.usersvcClient.PageUsers(ctx, nil, vo1.PageQuery{
+	//	Filter: vo1.PageFilter(query.Filter),
+	//	Page: vo1.Page{
+	//		Orders: nil,
+	//		PageNo: query.Page.PageNo,
+	//		Size:   query.Page.Size,
+	//	},
+	//})
+	//data = vo.PageRet(_data)
 	return
 }
 

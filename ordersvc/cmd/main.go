@@ -3,10 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/opentracing/opentracing-go"
-	"github.com/sirupsen/logrus"
 	ddhttp "github.com/unionj-cloud/go-doudou/framework/http"
 	"github.com/unionj-cloud/go-doudou/framework/logger"
-	"github.com/unionj-cloud/go-doudou/framework/registry"
 	"github.com/unionj-cloud/go-doudou/framework/tracing"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
@@ -33,11 +31,11 @@ func main() {
 		})))
 	}
 
-	err := registry.NewNode()
-	if err != nil {
-		logrus.Panicln(fmt.Sprintf("%+v", err))
-	}
-	defer registry.Shutdown()
+	//err := registry.NewNode()
+	//if err != nil {
+	//	logrus.Panicln(fmt.Sprintf("%+v", err))
+	//}
+	//defer registry.Shutdown()
 
 	tracer, closer := tracing.Init()
 	defer closer.Close()
@@ -51,6 +49,7 @@ func main() {
 
 	handler := httpsrv.NewOrdersvcHandler(svc)
 	srv := ddhttp.NewDefaultHttpSrv()
+	srv.Use(ddhttp.BodyMaxBytes(413))
 	srv.AddRoute(httpsrv.Routes(handler)...)
 	srv.Run()
 }
