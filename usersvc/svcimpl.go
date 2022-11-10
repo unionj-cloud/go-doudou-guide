@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/unionj-cloud/go-doudou/v2/framework/rest"
 	"io"
 	"os"
 	"strings"
@@ -11,20 +12,20 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 
-	ddhttp "github.com/unionj-cloud/go-doudou/framework/http"
-
-	v3 "github.com/unionj-cloud/go-doudou/toolkit/openapi/v3"
+	v3 "github.com/unionj-cloud/go-doudou/v2/toolkit/openapi/v3"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 )
+
+var _ Usersvc = (*UsersvcImpl)(nil)
 
 type UsersvcImpl struct {
 	conf *config.Config
 }
 
 func (receiver *UsersvcImpl) GetUser4(ctx context.Context, userId string, photo *string, pattrs *[]int, attrs2 ...int) (code int, data *string, msg error) {
-	return 0, nil, ddhttp.NewBizError(errors.New("test error"), ddhttp.WithStatusCode(555), ddhttp.WithErrCode(10001))
+	return 0, nil, rest.NewBizError(errors.New("test error"), rest.WithStatusCode(555), rest.WithErrCode(10001))
 }
 
 func (receiver *UsersvcImpl) GetDownloadAvatar(ctx context.Context, userId string) (string, *os.File, error) {
@@ -127,7 +128,7 @@ func (receiver *UsersvcImpl) PageUsers(ctx context.Context, query vo.PageQuery) 
 	}
 }
 
-func NewUsersvc(conf *config.Config) Usersvc {
+func NewUsersvc(conf *config.Config) *UsersvcImpl {
 	return &UsersvcImpl{
 		conf,
 	}

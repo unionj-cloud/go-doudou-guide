@@ -2,10 +2,13 @@ package service
 
 import (
 	"context"
-	v3 "github.com/unionj-cloud/go-doudou/toolkit/openapi/v3"
+	v3 "github.com/unionj-cloud/go-doudou/v2/toolkit/openapi/v3"
 	"os"
 	"usersvc/vo"
 )
+
+//go:generate go-doudou svc http -c
+//go:generate go-doudou svc grpc
 
 // Usersvc User Center Service
 type Usersvc interface {
