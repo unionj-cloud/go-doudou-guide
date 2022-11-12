@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	"github.com/opentracing/opentracing-go"
 	"github.com/unionj-cloud/go-doudou/v2/framework/ratelimit"
 	"github.com/unionj-cloud/go-doudou/v2/framework/ratelimit/memrate"
+	"github.com/unionj-cloud/go-doudou/v2/framework/ratelimit/redisrate"
 	"github.com/unionj-cloud/go-doudou/v2/framework/rest"
 	"github.com/unionj-cloud/go-doudou/v2/framework/tracing"
 	"github.com/unionj-cloud/go-doudou/v2/toolkit/zlogger"
@@ -45,18 +47,18 @@ func main() {
 		}))
 	})
 
-	//rdb := redis.NewClient(&redis.Options{
-	//	Addr: "localhost:6379",
-	//})
-	//
-	//fn := redisrate.LimitFn(func(ctx context.Context) ratelimit.Limit {
-	//	return ratelimit.PerSecondBurst(10, 30)
-	//})
+	rdb := redis.NewClient(&redis.Options{
+		Addr: "localhost:6379",
+	})
+
+	fn := redisrate.LimitFn(func(ctx context.Context) ratelimit.Limit {
+		return ratelimit.PerSecondBurst(10, 30)
+	})
 
 	srv.AddMiddleware(
 		rest.BulkHead(1, 10*time.Millisecond),
 		httpsrv.RateLimit(store),
-		//httpsrv.RedisRateLimit(rdb, fn),
+		httpsrv.RedisRateLimit(rdb, fn),
 	)
 	srv.AddRoute(httpsrv.Routes(handler)...)
 	srv.Run()
